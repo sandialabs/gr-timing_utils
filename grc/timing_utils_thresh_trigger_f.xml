@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<block>
+  <name>Threshold Trigger</name>
+  <key>timing_utils_thresh_trigger_f</key>
+  <category>[Sandia]/Timing Utilities</category>
+  <import>import timing_utils</import>
+  <make>timing_utils.thresh_trigger_f($hi, $low, $length)</make>
+
+  <callback>set_hi($hi)</callback>
+  <callback>set_lo($low)</callback>
+  <callback>set_len($length)</callback>
+
+  <param>
+    <name>Threshold High</name>
+    <key>hi</key>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Threshold Low</name>
+    <key>low</key>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Length Threshold</name>
+    <key>length</key>
+    <type>int</type>
+  </param>
+
+  <sink>
+    <name>mag</name>
+    <type>float</type>
+  </sink>
+
+  <sink>
+    <name>disarm</name>
+    <type>message</type>
+    <optional>1</optional>
+  </sink>
+
+  <source>
+    <name>trig</name>
+    <type>message</type>
+    <optional>1</optional>
+  </source>
+
+</block>

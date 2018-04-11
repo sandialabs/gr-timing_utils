@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<block>
+  <name>UHD Timed PDU Emitter</name>
+  <key>timing_utils_uhd_timed_pdu_emitter</key>
+  <category>[Sandia]/Timing Utilities</category>
+  <import>import timing_utils</import>
+  <make>timing_utils.uhd_timed_pdu_emitter($rate, $late_pdu_mode)</make>
+
+  <param>
+    <name>Sample Rate</name>
+    <key>rate</key>
+    <value>samp_rate</value>
+    <type>float</type>
+  </param>
+
+  <param>
+    <name>Drop Late?</name>
+    <key>late_pdu_mode</key>
+    <value>False</value>
+    <type>bool</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+  <sink>
+    <name>set</name>
+    <type>message</type>
+    <optional>1</optional>
+  </sink>
+
+  <source>
+    <name>trig</name>
+    <type>message</type>
+    <optional>1</optional>
+  </source>
+
+  <doc>Block tracks UHD stream tags and allows a message to be emitted at a specific UHD time.</doc>
+
+</block>

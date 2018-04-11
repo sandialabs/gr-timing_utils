@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<block>
+  <name>USRP GPS Time Sync</name>
+  <key>timing_utils_usrp_gps_time_sync</key>
+  <category>[Sandia]/Timing Utilities</category>
+  <import>import timing_utils</import>
+  <make>timing_utils.usrp_gps_time_sync(self,$usrp_source)</make>
+
+  <param>
+    <name>USRP</name>
+    <key>usrp_source</key>
+    <value>uhd_usrp_source_0</value>
+    <type>string</type>
+  </param>
+  
+  <!-- Looks like we need this -->
+  <sink>
+    <name>in</name>
+    <type>message</type>
+    <optional>1</optional>
+  </sink>
+
+</block>
