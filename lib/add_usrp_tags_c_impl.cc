@@ -24,6 +24,7 @@
 #endif
 
 #include <gnuradio/io_signature.h>
+#include <stdio.h>
 #include "add_usrp_tags_c_impl.h"
 
 namespace gr {
@@ -50,6 +51,11 @@ namespace gr {
                                   pmt::from_double(epoch_frac));
 
       tag_now(0);
+      d_tagged_sample = 0;
+      d_pmt_dict = pmt::make_dict();
+      d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_rate"), d_rate_pmt);
+      d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_freq"), d_freq_pmt);
+      d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_time"), d_time_pmt);
     }
 
     /*
@@ -57,6 +63,30 @@ namespace gr {
      */
     add_usrp_tags_c_impl::~add_usrp_tags_c_impl()
     {
+    }
+
+    void add_usrp_tags_c_impl::update_tags(pmt::pmt_t update) {
+        if (!pmt::is_dict(update)) {
+            GR_LOG_NOTICE(d_logger, "received unexpected PMT (non-dict)");
+            return;
+        }
+
+        pmt::pmt_t value = pmt::dict_ref(update, pmt::mp("rx_freq"), pmt::PMT_NIL);
+        if (value != pmt::PMT_NIL) d_freq_pmt = value;
+        value = pmt::dict_ref(update, pmt::mp("rx_rate"), pmt::PMT_NIL);
+        if (value != pmt::PMT_NIL) d_rate_pmt = value;
+        value = pmt::dict_ref(update, pmt::mp("rx_time"), pmt::PMT_NIL);
+        if (value != pmt::PMT_NIL) d_time_pmt = value;
+        d_tag_now = true;
+        d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_rate"), d_rate_pmt);
+        d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_freq"), d_freq_pmt);
+        d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_time"), d_time_pmt);
+        printf("Updating tags\n");
+    }
+
+    pmt::pmt_t add_usrp_tags_c_impl::last_tag() {
+        pmt::pmt_t retDict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_sample"), pmt::from_uint64(d_tagged_sample));
+        return retDict;
     }
 
 
@@ -76,6 +106,7 @@ namespace gr {
         add_item_tag(0, nitems_read(0), pmt::mp("rx_freq"), d_freq_pmt);
         add_item_tag(0, nitems_read(0), pmt::mp("rx_rate"), d_rate_pmt);
         add_item_tag(0, nitems_read(0), pmt::mp("rx_time"), d_time_pmt);
+        d_tagged_sample = nitems_read(0);
         d_tag_now = false;
       }
 

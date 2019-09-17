@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<block>
+  <name>System Time Difference</name>
+  <key>timing_utils_system_time_diff_X</key>
+  <category>[Sandia]/Timing Utilities</category>
+  <import>import timing_utils</import>
+  <import>import pmt</import>
+  <make>timing_utils.system_time_diff_$(type)($output_data, $update_time, $output_diff)</make>
+ 
+  <param>
+    <name>Type</name>
+    <key>type</key>
+    <type>enum</type>
+    <option>
+      <name>Complex</name>
+      <key>c</key>
+      <opt>type:complex</opt>
+    </option>
+    <option>
+      <name>Float</name>
+      <key>f</key>
+      <opt>type:float</opt>
+    </option>
+    <option>
+      <name>Short</name>
+      <key>s</key>
+      <opt>type:short</opt>
+    </option>
+    <option>
+      <name>Byte</name>
+      <key>b</key>
+      <opt>type:byte</opt>
+    </option>
+  </param>
+  
+  <param>
+    <name>Data Output?</name>
+    <key>output_data</key>
+    <value>False</value>
+    <type>enum</type>
+    <option>
+      <name>Yes</name>
+      <key>True</key>
+      <opt>hide:False</opt>
+    </option>
+    <option>
+      <name>No</name>
+      <key>False</key>
+      <opt>hide:True</opt>
+    </option>
+  </param>
+  
+  <param>
+    <name>Update Time?</name>
+    <key>update_time</key>
+    <value>False</value>
+    <type>enum</type>
+    <option>
+      <name>Yes</name>
+      <key>True</key>
+      <opt>hide:False</opt>
+    </option>
+    <option>
+      <name>No</name>
+      <key>False</key>
+      <opt>hide:True</opt>
+    </option>
+  </param>
+  
+  <param>
+    <name>Output Difference?</name>
+    <key>output_diff</key>
+    <value>False</value>
+    <type>enum</type>
+    <option>
+      <name>Yes</name>
+      <key>True</key>
+      <opt>hide:False</opt>
+    </option>
+    <option>
+      <name>No</name>
+      <key>False</key>
+      <opt>hide:True</opt>
+    </option>
+  </param>
+    
+  <sink>
+    <name>in</name>
+    <type>$type.type</type>
+  </sink>
+  
+  <source>
+    <name>out</name>
+    <type>$type.type</type>
+    <optional>1</optional>
+    <hide>$output_data.hide</hide>
+  </source>
+  
+  <source>
+    <name>diff</name>
+    <type>float</type>
+    <optional>1</optional>
+    <hide>$output_diff.hide</hide>
+  </source>
+</block>

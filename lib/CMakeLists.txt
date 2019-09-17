@@ -23,6 +23,8 @@
 include(GrMiscUtils)
 GR_EXPAND_X_CC_H(timing_utils timed_freq_xlating_fir_XXX_impl   ccc ccf fcc fcf scf scc)
 GR_EXPAND_X_CC_H(timing_utils tag_uhd_offset_X_impl             c f s b)
+GR_EXPAND_X_CC_H(timing_utils system_time_tagger_X_impl             c f s b)
+GR_EXPAND_X_CC_H(timing_utils system_time_diff_X_impl             c f s b)
 
 ########################################################################
 # Setup library
@@ -36,6 +38,7 @@ list(APPEND timing_utils_sources
     clock_mm_tags_ff_impl.cc
     add_usrp_tags_c_impl.cc
     uhd_timed_pdu_emitter_impl.cc
+    interrupt_emitter_impl.cc
     thresh_trigger_f_impl.cc
 )
 

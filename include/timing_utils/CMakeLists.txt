@@ -23,6 +23,8 @@
 include(GrMiscUtils)
 GR_EXPAND_X_H(timing_utils timed_freq_xlating_fir_XXX  ccc ccf fcc fcf scf scc)
 GR_EXPAND_X_H(timing_utils tag_uhd_offset_X            c f s b)
+GR_EXPAND_X_H(timing_utils system_time_tagger_X          c f s b)
+GR_EXPAND_X_H(timing_utils system_time_diff_X          c f s b)
 
 add_custom_target(timing_utils_generated_includes DEPENDS
     ${generated_includes}
@@ -38,5 +40,6 @@ install(FILES
     clock_mm_tags_ff.h
     add_usrp_tags_c.h
     uhd_timed_pdu_emitter.h
+    interrupt_emitter.h
     thresh_trigger_f.h DESTINATION include/timing_utils
 )

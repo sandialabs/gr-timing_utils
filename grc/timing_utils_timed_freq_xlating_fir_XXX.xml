@@ -9,6 +9,7 @@
 
   <callback>set_taps($taps)</callback>
 	<callback>set_center_freq($center_freq)</callback>
+  <callback>set_decim($decim)</callback>
 	<param>
 		<name>Type</name>
 		<key>type</key>

@@ -33,7 +33,7 @@ namespace gr {
     // other constants
     static const pmt::pmt_t PMTCONSTSTR__RX_TIME = pmt::mp("rx_time");
     static const pmt::pmt_t PMTCONSTSTR__FREQ = pmt::mp("freq");
-
+    static const pmt::pmt_t PMTCONSTSTR__WALL_CLOCK_TIME = pmt::mp("wall_clock_time");
 
   } // namespace timing_utils
 } // namespace gr

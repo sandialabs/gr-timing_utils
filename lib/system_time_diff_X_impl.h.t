@@ -1,58 +1,60 @@
 /* -*- c++ -*- */
-/*
+/* 
  * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
- *
+ * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
  * Boston, MA 02110-1301, USA.
  */
 
+/* @WARNING@ */
 
-#ifndef INCLUDED_TIMING_UTILS_ADD_USRP_TAGS_C_H
-#define INCLUDED_TIMING_UTILS_ADD_USRP_TAGS_C_H
+#ifndef @GUARD_NAME@
+#define @GUARD_NAME@
 
-#include <timing_utils/api.h>
-#include <gnuradio/sync_block.h>
+#include <timing_utils/@BASE_NAME@.h>
+#include <timing_utils/constants.h>
+#include <boost/thread/thread_time.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace gr {
   namespace timing_utils {
 
-    /*!
-     * \brief <+description of block+>
-     * \ingroup timing_utils
-     *
-     */
-    class TIMING_UTILS_API add_usrp_tags_c : virtual public gr::sync_block
+    class @IMPL_NAME@ : public @BASE_NAME@
     {
-     public:
-      typedef boost::shared_ptr<add_usrp_tags_c> sptr;
+     private:
+      boost::posix_time::ptime  d_epoch;
+      bool                      d_update_time;
+      bool                      d_output_data;
+      bool                      d_output_diff;
+      
+      // output difference port depends on if data is being output as well
+      int                       d_diff_port;
 
-      /*!
-       * \brief Return a shared_ptr to a new instance of timing_utils::add_usrp_tags_c.
-       *
-       * To avoid accidental use of raw pointers, timing_utils::add_usrp_tags_c's
-       * constructor is in a private implementation
-       * class. timing_utils::add_usrp_tags_c::make is the public interface for
-       * creating new instances.
-       */
-      virtual void tag_now(uint32_t dummy) = 0;
-      virtual void update_tags(pmt::pmt_t update) = 0;
-      virtual pmt::pmt_t last_tag() = 0;
-      static sptr make(double freq, double rate, uint64_t epoch_int, double epoch_frac);
+     public:
+      @IMPL_NAME@(bool output_data, bool update_time, bool output_diff);
+      ~@IMPL_NAME@();
+
+      // Where all the action really happens
+      int general_work(int noutput_items,
+        gr_vector_int &ninput_items,
+        gr_vector_const_void_star &input_items,
+        gr_vector_void_star &output_items);
     };
 
   } // namespace timing_utils
 } // namespace gr
 
-#endif /* INCLUDED_TIMING_UTILS_ADD_USRP_TAGS_C_H */
+#endif /* @GUARD_NAME@ */
+

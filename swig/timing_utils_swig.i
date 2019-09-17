@@ -9,6 +9,7 @@
 
 %{
 #include "timing_utils/constants.h"
+#include "timing_utils/interrupt_emitter.h"
 #include "timing_utils/timed_freq_xlating_fir_ccc.h"
 #include "timing_utils/timed_freq_xlating_fir_ccf.h"
 #include "timing_utils/timed_freq_xlating_fir_fcc.h"
@@ -23,10 +24,20 @@
 #include "timing_utils/tag_uhd_offset_b.h"
 #include "timing_utils/uhd_timed_pdu_emitter.h"
 #include "timing_utils/thresh_trigger_f.h"
+#include "timing_utils/system_time_tagger_c.h"
+#include "timing_utils/system_time_tagger_f.h"
+#include "timing_utils/system_time_tagger_s.h"
+#include "timing_utils/system_time_tagger_b.h"
+#include "timing_utils/system_time_diff_c.h"
+#include "timing_utils/system_time_diff_f.h"
+#include "timing_utils/system_time_diff_s.h"
+#include "timing_utils/system_time_diff_b.h"
 %}
 
 %include "timing_utils/constants.h"
 
+%include "timing_utils/interrupt_emitter.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, interrupt_emitter);
 %include "timing_utils/timed_freq_xlating_fir_ccc.h"
 GR_SWIG_BLOCK_MAGIC2(timing_utils, timed_freq_xlating_fir_ccc);
 %include "timing_utils/timed_freq_xlating_fir_ccf.h"
@@ -55,3 +66,19 @@ GR_SWIG_BLOCK_MAGIC2(timing_utils, tag_uhd_offset_b);
 GR_SWIG_BLOCK_MAGIC2(timing_utils, uhd_timed_pdu_emitter);
 %include "timing_utils/thresh_trigger_f.h"
 GR_SWIG_BLOCK_MAGIC2(timing_utils, thresh_trigger_f);
+%include "timing_utils/system_time_tagger_c.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, system_time_tagger_c);
+%include "timing_utils/system_time_tagger_f.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, system_time_tagger_f);
+%include "timing_utils/system_time_tagger_s.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, system_time_tagger_s);
+%include "timing_utils/system_time_tagger_b.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, system_time_tagger_b);
+%include "timing_utils/system_time_diff_c.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, system_time_diff_c);
+%include "timing_utils/system_time_diff_f.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, system_time_diff_f);
+%include "timing_utils/system_time_diff_s.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, system_time_diff_s);
+%include "timing_utils/system_time_diff_b.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, system_time_diff_b);

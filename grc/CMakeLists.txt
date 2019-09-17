@@ -26,5 +26,8 @@ install(FILES
     timing_utils_thresh_trigger_f.xml
     timing_utils_edge_distance.xml
     timing_utils_edge_detector_bb.xml
-    timing_utils_usrp_gps_time_sync.xml DESTINATION share/gnuradio/grc/blocks
+    timing_utils_usrp_gps_time_sync.xml
+    timing_utils_interrupt_emitter.xml
+    timing_utils_system_time_diff_X.xml 
+    timing_utils_system_time_tagger_X.xml DESTINATION share/gnuradio/grc/blocks
 )

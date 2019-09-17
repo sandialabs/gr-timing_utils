@@ -19,11 +19,12 @@
  */
 
 
-#ifndef INCLUDED_TIMING_UTILS_ADD_USRP_TAGS_C_H
-#define INCLUDED_TIMING_UTILS_ADD_USRP_TAGS_C_H
+#ifndef INCLUDED_TIMING_UTILS_INTERRUPT_EMITTER_H
+#define INCLUDED_TIMING_UTILS_INTERRUPT_EMITTER_H
 
 #include <timing_utils/api.h>
 #include <gnuradio/sync_block.h>
+//#include <boost/chrono.hpp>
 
 namespace gr {
   namespace timing_utils {
@@ -33,26 +34,27 @@ namespace gr {
      * \ingroup timing_utils
      *
      */
-    class TIMING_UTILS_API add_usrp_tags_c : virtual public gr::sync_block
+    class TIMING_UTILS_API interrupt_emitter : virtual public gr::sync_block
     {
      public:
-      typedef boost::shared_ptr<add_usrp_tags_c> sptr;
+      typedef boost::shared_ptr<interrupt_emitter> sptr;
 
       /*!
-       * \brief Return a shared_ptr to a new instance of timing_utils::add_usrp_tags_c.
+       * \brief Return a shared_ptr to a new instance of timing_utils::uhd_timed_pdu_emitter.
        *
-       * To avoid accidental use of raw pointers, timing_utils::add_usrp_tags_c's
+       * To avoid accidental use of raw pointers, timing_utils::uhd_timed_pdu_emitter's
        * constructor is in a private implementation
-       * class. timing_utils::add_usrp_tags_c::make is the public interface for
+       * class. timing_utils::uhd_timed_pdu_emitter::make is the public interface for
        * creating new instances.
        */
-      virtual void tag_now(uint32_t dummy) = 0;
-      virtual void update_tags(pmt::pmt_t update) = 0;
-      virtual pmt::pmt_t last_tag() = 0;
-      static sptr make(double freq, double rate, uint64_t epoch_int, double epoch_frac);
+      virtual void set_rate(double rate) = 0;
+      virtual void set_debug(bool value) = 0;
+      virtual bool start() = 0;
+
+      static sptr make(double rate, bool drop_late);
     };
 
   } // namespace timing_utils
 } // namespace gr
 
-#endif /* INCLUDED_TIMING_UTILS_ADD_USRP_TAGS_C_H */
+#endif /* INCLUDED_TIMING_UTILS_INTERRUPT_EMITTER_H */

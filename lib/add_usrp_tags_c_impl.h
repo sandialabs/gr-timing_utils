@@ -33,6 +33,8 @@ namespace gr {
        pmt::pmt_t d_freq_pmt;
        pmt::pmt_t d_rate_pmt;
        pmt::pmt_t d_time_pmt;
+       pmt::pmt_t d_pmt_dict;
+       uint64_t d_tagged_sample;
        bool d_tag_now;
 
      public:
@@ -41,6 +43,8 @@ namespace gr {
 
       // the dummy argument allows the GRC callback to call this function
       void tag_now(uint32_t dummy) { d_tag_now = true; }
+      void update_tags(pmt::pmt_t update);
+      pmt::pmt_t last_tag();
 
       // Where all the action really happens
       int work(int noutput_items,

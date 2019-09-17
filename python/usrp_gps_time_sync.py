@@ -37,11 +37,18 @@ class usrp_gps_time_sync(gr.sync_block):
       
       self.parent = parent
       self.usrp_source = usrp_source
+      self.usrp_source_object = None
       
       self.message_port_register_in(pmt.intern("in"))
       self.set_msg_handler(pmt.intern("in"),self.msg_handler)
+      
+      # current gps status
+      self.has_gpsdo = False
+      self.gps_locked = False
 
     def start(self):
+      print "Starting GPS Time Sync"
+
       '''
       Overload start function
       '''
@@ -49,10 +56,53 @@ class usrp_gps_time_sync(gr.sync_block):
         # Check to ensure
         self.usrp_source_object = eval("self.parent.%s"%self.usrp_source)
         
+        # Check if we have a GPSDO
+        names = self.usrp_source_object.get_mboard_sensor_names()
+        if 'gps_time' in names:
+          self.has_gpsdo = True
+        
       except AttributeError:
         print "Unable to acquire usrp object for synchronization"
         return True
+
+      # synchronize
+      self.synchronize()
       
+      # if not locked, default time to current system time
+      if not self.gps_locked:
+	try:
+          print "USRP GPS Time Sync: Defaulting to Current System Time"
+          self.usrp_source_object.set_time_now(uhd.time_spec_t(time.time()))
+        except Exception as e:
+          print "Set Time Next PPS Error: " + repr(e)
+      
+      return True
+
+    def synchronize(self):
+      if (self.usrp_source_object == None) or (self.has_gpsdo == False):
+        return False
+
+      # check if gps is locked
+      locked = self.usrp_source_object.get_mboard_sensor("gps_locked").to_bool()
+
+      # only set time if changing from unlocked to locked
+      if (self.gps_locked) and (locked):
+        # no change in lock status
+        self.gps_locked = locked
+        return True
+      elif (self.gps_locked) and (not locked):
+        # system became unlocked - do nothing
+        self.gps_locked = locked
+        return True
+      elif (not self.gps_locked) and (not locked):
+        # system remains unlocked
+        self.gps_locked = locked
+        return True
+      else:
+        # system has gone from unlocked to locked
+        self.gps_locked = locked
+        pass
+
       # stop first
       self.usrp_source_object.stop()
       print "USRP Object Stopped for Time Synchronization"
@@ -101,13 +151,11 @@ class usrp_gps_time_sync(gr.sync_block):
       # restart
       self.usrp_source_object.start()
       print "USRP Objected Restarted After Time Synchronization"
-        
 
-    
       return True
     
     def msg_handler(self,p):
-      pass
+      self.synchronize()
 
     def work(self, input_items, output_items):
       pass

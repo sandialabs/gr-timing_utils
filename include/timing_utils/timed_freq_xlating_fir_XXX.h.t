@@ -81,6 +81,34 @@ namespace gr {
     				  double sampling_freq,
                                   std::string tag_key = "set_freq");
 
+          /*!
+           * \brief Set FIR filter decimation
+           *
+           * \param decimation set the integer decimation rate
+           */
+          virtual void set_decim(int decimation) = 0;
+
+          /*!
+           * \brief Get FIR filter decimation
+           *
+           * \return integer decimation rate
+           */
+          virtual int decim() const = 0;
+
+          /*!
+           * \brief Set FIR filter sampling rate
+           *
+           * \param rate  set the sampling rate (Hz)
+           */
+          virtual void set_rate(double rate) = 0;
+
+          /*!
+           * \brief Get FIR filter sampling rate
+           *
+           * \return sampling rate (Hz)
+           */
+          virtual double rate() const = 0;
+
           virtual void set_center_freq(double center_freq) = 0;
           virtual double center_freq() const = 0;
 
