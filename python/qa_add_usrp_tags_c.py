@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 # 
 # Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
@@ -19,6 +19,7 @@
 # Boston, MA 02110-1301, USA.
 # 
 
+from builtins import range
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import timing_utils_swig as timing_utils
@@ -52,7 +53,7 @@ class qa_add_usrp_tags_c (gr_unittest.TestCase):
     def test_002_update(self):
         start_time = 0.1
         self.duration = 125000
-        self.src = blocks.vector_source_c(range(self.duration), False, 1, [])
+        self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [])
         self.throttle = blocks.throttle(gr.sizeof_gr_complex*1, 250000)
         self.utag = timing_utils.add_usrp_tags_c(1090e6, 250000, 0, start_time)
         self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "");
@@ -68,4 +69,4 @@ class qa_add_usrp_tags_c (gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_add_usrp_tags_c, "qa_add_usrp_tags_c.xml")
+    gr_unittest.run(qa_add_usrp_tags_c, "qa_add_usrp_tags_c.yml")

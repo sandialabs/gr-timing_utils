@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 # 
 # Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
@@ -47,7 +47,7 @@ class usrp_gps_time_sync(gr.sync_block):
       self.gps_locked = False
 
     def start(self):
-      print "Starting GPS Time Sync"
+      print("Starting GPS Time Sync")
 
       '''
       Overload start function
@@ -62,7 +62,7 @@ class usrp_gps_time_sync(gr.sync_block):
           self.has_gpsdo = True
         
       except AttributeError:
-        print "Unable to acquire usrp object for synchronization"
+        print("Unable to acquire usrp object for synchronization")
         return True
 
       # synchronize
@@ -70,11 +70,11 @@ class usrp_gps_time_sync(gr.sync_block):
       
       # if not locked, default time to current system time
       if not self.gps_locked:
-	try:
-          print "USRP GPS Time Sync: Defaulting to Current System Time"
+        try:
+          print("USRP GPS Time Sync: Defaulting to Current System Time")
           self.usrp_source_object.set_time_now(uhd.time_spec_t(time.time()))
         except Exception as e:
-          print "Set Time Next PPS Error: " + repr(e)
+          print("Set Time Next PPS Error: " + repr(e))
       
       return True
 
@@ -105,7 +105,7 @@ class usrp_gps_time_sync(gr.sync_block):
 
       # stop first
       self.usrp_source_object.stop()
-      print "USRP Object Stopped for Time Synchronization"
+      print("USRP Object Stopped for Time Synchronization")
       
       # TODO: Find way to ensure we poll as closely to the second boundary as
       # possible to ensure we get as accurate a reading as possible
@@ -120,37 +120,37 @@ class usrp_gps_time_sync(gr.sync_block):
       
       # we only care about the full seconds
       gps_seconds = self.usrp_source_object.get_mboard_sensor("gps_time").to_int()
-      print "gps_seconds = " + repr(gps_seconds)
+      print("gps_seconds = " + repr(gps_seconds))
       pps_seconds = self.usrp_source_object.get_time_last_pps().to_ticks(1.0)
-      print "pps_seconds = " + repr(pps_seconds)
+      print("pps_seconds = " + repr(pps_seconds))
       
       if (pps_seconds != gps_seconds):
-        print "\nTrying to align the device time to GPS time..."
+        print("\nTrying to align the device time to GPS time...")
         try:
           self.usrp_source_object.set_time_next_pps(uhd.time_spec_t(gps_seconds + 1))
         except Exception as e:
-          print "Set Time Next PPS Error: " + repr(e)
+          print("Set Time Next PPS Error: " + repr(e))
         
         # allow some time to make sure the PPS has come
         time.sleep(1.1)
         
         # check again
         gps_seconds = self.usrp_source_object.get_mboard_sensor("gps_time").to_int()
-        print "updated gps_time = " + repr(gps_seconds)
+        print("updated gps_time = " + repr(gps_seconds))
         pps_seconds = self.usrp_source_object.get_time_last_pps().to_ticks(1.0)
-        print "updated last_pps_time = " + repr(pps_seconds)
+        print("updated last_pps_time = " + repr(pps_seconds))
         
       if (pps_seconds == gps_seconds):
-        print "Successful USRP GPS Time Synchronization"
+        print("Successful USRP GPS Time Synchronization")
       else:
-        print "Unable to synchronize GPS time"
+        print("Unable to synchronize GPS time")
         
       # set start time in future
       self.usrp_source_object.set_start_time(uhd.time_spec_t(gps_seconds+2.0))
       
       # restart
       self.usrp_source_object.start()
-      print "USRP Objected Restarted After Time Synchronization"
+      print("USRP Objected Restarted After Time Synchronization")
 
       return True
     

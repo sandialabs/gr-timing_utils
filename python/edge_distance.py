@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 #
 # Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
@@ -53,7 +53,7 @@ class edge_distance(gr.sync_block):
                 self.start_idx = tag.offset
             elif pmt.eqv(tag.key, self.et):
                 if self.start_idx:
-                    print repr(round((tag.offset - self.start_idx) * 1000.0 / self.rate, 3)) + ", "
+                    print(repr(round((tag.offset - self.start_idx) * 1000.0 / self.rate, 3)) + ", ")
                 self.start_idx = 0
 
         return len(in0)

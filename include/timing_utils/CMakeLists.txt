@@ -17,14 +17,36 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 
-########################################################################
-# Invoke macro to generate various headers
-#######################################################################
 include(GrMiscUtils)
-GR_EXPAND_X_H(timing_utils timed_freq_xlating_fir_XXX  ccc ccf fcc fcf scf scc)
-GR_EXPAND_X_H(timing_utils tag_uhd_offset_X            c f s b)
-GR_EXPAND_X_H(timing_utils system_time_tagger_X          c f s b)
-GR_EXPAND_X_H(timing_utils system_time_diff_X          c f s b)
+
+list(APPEND include_sources
+    add_usrp_tags_c.h   
+    interrupt_emitter.h   
+    system_time_diff_s.h    
+    system_time_tagger_s.h    
+    tag_uhd_offset_s.h            
+    timed_freq_xlating_fir_fcc.h    
+    uhd_timed_pdu_emitter.h
+    api.h               
+    ReferenceTimer.h      
+    timed_freq_xlating_fir_fcf.h
+    clock_mm_tags_ff.h  
+    system_time_diff_b.h  
+    system_time_tagger_b.h  
+    tag_uhd_offset_b.h        
+    thresh_trigger_f.h            
+    timed_freq_xlating_fir_scc.h
+    system_time_diff_c.h  
+    system_time_tagger_c.h  
+    tag_uhd_offset_c.h        
+    timed_freq_xlating_fir_ccc.h  
+    timed_freq_xlating_fir_scf.h
+    constants.h         
+    system_time_diff_f.h  
+    system_time_tagger_f.h  
+    tag_uhd_offset_f.h        
+    timed_freq_xlating_fir_ccf.h      
+)
 
 add_custom_target(timing_utils_generated_includes DEPENDS
     ${generated_includes}
@@ -34,12 +56,6 @@ add_custom_target(timing_utils_generated_includes DEPENDS
 # Install public header files
 ########################################################################
 install(FILES
-    ${generated_includes}
-    api.h
-    constants.h
-    clock_mm_tags_ff.h
-    add_usrp_tags_c.h
-    uhd_timed_pdu_emitter.h
-    interrupt_emitter.h
-    thresh_trigger_f.h DESTINATION include/timing_utils
+    ${include_sources}
+    DESTINATION include/timing_utils
 )

@@ -22,17 +22,18 @@
 This is the GNU Radio TIMING_UTILS module. Place your Python package
 description here (python/__init__.py).
 '''
+from __future__ import unicode_literals
 
 # import swig generated symbols into the timing_utils namespace
 try:
-	# this might fail if the module is python-only
-	from timing_utils_swig import *
+    # this might fail if the module is python-only
+    from .timing_utils_swig import *
 except ImportError:
-	pass
+    pass
 
 # import any pure python here
-from retune_uhd_to_timed_tag import retune_uhd_to_timed_tag
-from edge_distance import edge_distance
-from edge_detector_bb import *
-from usrp_gps_time_sync import usrp_gps_time_sync
 #
+from .retune_uhd_to_timed_tag import retune_uhd_to_timed_tag
+from .edge_distance import edge_distance
+from .edge_detector_bb import *
+from .usrp_gps_time_sync import usrp_gps_time_sync

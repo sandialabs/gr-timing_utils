@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 # 
 # Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
@@ -19,6 +19,7 @@
 # Boston, MA 02110-1301, USA.
 # 
 
+from builtins import range
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import timing_utils_swig as timing_utils
@@ -38,7 +39,7 @@ class qa_system_time_diff_X (gr_unittest.TestCase):
         self.interval = 173
         self.duration = 9000
         
-        self.src = blocks.vector_source_c(range(self.duration), False, 1, [])
+        self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [])
         self.time_diff = timing_utils.system_time_diff_c()
         self.tb.connect((self.src,0),(self.time_diff,0))
         

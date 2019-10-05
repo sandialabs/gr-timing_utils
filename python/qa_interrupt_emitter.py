@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 #
 # Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
@@ -19,6 +19,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
+from builtins import range
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import timing_utils_swig as timing_utils
@@ -39,7 +40,7 @@ class qa_interrupt_emitter (gr_unittest.TestCase):
         
         self.tb = gr.top_block ()
         
-        self.src = blocks.vector_source_c(range(self.duration), False, 1, [])
+        self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [])
         self.throttle = blocks.throttle(gr.sizeof_gr_complex*1, self.rate)
 
         self.emitter = pdu_utils.message_emitter(pmt.PMT_NIL)

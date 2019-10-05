@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 #
 # Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
@@ -19,6 +19,7 @@
 # Boston, MA 02110-1301, USA.
 #
 
+from builtins import range
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import timing_utils_swig as timing_utils
@@ -40,7 +41,7 @@ class qa_tag_uhd_offset_X (gr_unittest.TestCase):
         self.interval = 173
         self.duration = 9000
 
-        self.src = blocks.vector_source_c(range(self.duration), False, 1, [])
+        self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [])
         self.utag = timing_utils.add_usrp_tags_c(1090e6, self.rate, 0, .98765)
         self.tags = timing_utils.tag_uhd_offset_c(self.rate, self.interval)
         self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "");
@@ -75,7 +76,7 @@ class qa_tag_uhd_offset_X (gr_unittest.TestCase):
         self.interval = 133
         self.duration = 4532
 
-        self.src = blocks.vector_source_c(range(self.duration), False, 1, [])
+        self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [])
         self.utag = timing_utils.add_usrp_tags_c(1090e6, self.rate, 0, .98765)
         self.tags = timing_utils.tag_uhd_offset_c(self.rate, self.interval)
         self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex*1, "", "");
@@ -109,7 +110,7 @@ class qa_tag_uhd_offset_X (gr_unittest.TestCase):
         self.interval = 1
         self.duration = 4321
 
-        self.src = blocks.vector_source_c(range(self.duration), False, 1, [])
+        self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [])
         self.utag = timing_utils.add_usrp_tags_c(1090e6, self.rate, 0, .98765)
         self.tags = timing_utils.tag_uhd_offset_c(self.rate, self.interval)
         self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex*1, "", "");
@@ -143,7 +144,7 @@ class qa_tag_uhd_offset_X (gr_unittest.TestCase):
         self.interval = 0
         self.duration = 4532
 
-        self.src = blocks.vector_source_c(range(self.duration), False, 1, [])
+        self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [])
         self.utag = timing_utils.add_usrp_tags_c(1090e6, self.rate, 0, .98765)
         self.tags = timing_utils.tag_uhd_offset_c(self.rate, self.interval)
         self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex*1, "", "");

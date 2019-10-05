@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 #
 # Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
@@ -65,8 +65,8 @@ class retune_uhd_to_timed_tag(gr.sync_block):
             self.dict_key = key
         except TypeError:
             self.dict_key = pmt.intern(key)
-            print "WARNING - input dictionary key should be provided as a PMT!"
-            print "            but it has been converted automatically"
+            print("WARNING - input dictionary key should be provided as a PMT!")
+            print("            but it has been converted automatically")
 
 
     def set_tag_key(self, key):
@@ -75,8 +75,8 @@ class retune_uhd_to_timed_tag(gr.sync_block):
             self.tag_key = key
         except TypeError:
             self.tag_key = pmt.intern(key)
-            print "WARNING - output tag key should be provided as a PMT!"
-            print "            but it has been converted automatically"
+            print("WARNING - output tag key should be provided as a PMT!")
+            printi("            but it has been converted automatically")
 
 
     def set_sample_rate(self, sample_rate):
@@ -88,7 +88,7 @@ class retune_uhd_to_timed_tag(gr.sync_block):
         self.ref_time['offset'] = long(offset)
         self.ref_time['secs'] = secs
         self.ref_time['frac'] = frac
-        print "Setting reference time for tuner to {}.{} for offset {}".format(secs,frac,offset)
+        print("Setting reference time for tuner to {}.{} for offset {}".format(secs,frac,offset))
 
 
     def handle_command(self, msg):
@@ -121,7 +121,7 @@ class retune_uhd_to_timed_tag(gr.sync_block):
                         self.tune_commands.append((tune_sample,pmt.from_double(-1.0*offset)))
 
             except Exception as e:
-                print "exception: " + repr(e)
+                print("exception: " + repr(e))
 
     def work(self, input_items, output_items):
         with self.lock:
@@ -142,7 +142,7 @@ class retune_uhd_to_timed_tag(gr.sync_block):
                     frac = pmt.to_double(pmt.tuple_ref(tags[-1].value,1))
                     self.set_ref_time(offset,sec,frac)
                 except Exception as e:
-                    print "invalid tag value: ", repr(e)
+                    print("invalid tag value: ", repr(e))
                     pass
 
             # if there is a tune that needs to be tagged
