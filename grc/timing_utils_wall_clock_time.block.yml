@@ -1,0 +1,25 @@
+id: timing_utils_wall_clock_time
+label: Wall Clock Time
+category: '[Sandia]/Timing Utilities'
+
+parameters:
+-   id: key
+    label: Key
+    dtype: raw
+    default: pmt.intern("wall_clock_time")
+
+inputs:
+-   domain: message
+    id: pdu_in
+    optional: true
+
+outputs:
+-   domain: message
+    id: pdu_out
+    optional: true
+
+templates:
+  imports: import timing_utils, pmt
+  make: timing_utils.wall_clock_time(${key})
+
+file_format: 1

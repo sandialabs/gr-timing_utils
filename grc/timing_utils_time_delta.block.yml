@@ -1,0 +1,30 @@
+id: timing_utils_time_delta
+label: Time Delta
+category: '[Sandia]/Timing Utilities'
+
+
+parameters:
+-   id: delta_key
+    label: Time Delta Key
+    dtype: raw
+    default: pmt.intern("time_delta_ms")
+-   id: time_key
+    label: Time Key
+    dtype: raw
+    default: pmt.intern("wall_clock_time")
+
+inputs:
+-   domain: message
+    id: pdu_in
+    optional: true
+
+outputs:
+-   domain: message
+    id: pdu_out
+    optional: true
+
+templates:
+  imports: import timing_utils, pmt
+  make: timing_utils.time_delta(${delta_key}, ${time_key})
+
+file_format: 1

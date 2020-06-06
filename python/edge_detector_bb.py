@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# <COPYRIGHT PLACEHOLDER>
+# Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC 
+# (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. 
+# Government retains certain rights in this software.
 #
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,13 +30,18 @@ ANY_EDGE = 2
 
 class edge_detector_bb(gr.sync_block):
     """
-    This block detects rising and/or falling edges on a binary input stream.
+    This block accepts a binary input stream of data and will output zeros except when an specified edge is detected.
     """
     def __init__(self, mode):
         gr.sync_block.__init__(self,
             name="edge_detector_bb",
             in_sig=[numpy.uint8],
             out_sig=[numpy.uint8])
+        '''
+        Constructor
+        
+        @param mode - ANY_EDGE, RISING_EDGE, FALLING_EDGE
+        '''
 
         self.prev_val = 0
         self.mode = mode

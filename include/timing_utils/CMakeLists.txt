@@ -17,14 +17,20 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 
-########################################################################
-# Invoke macro to generate various headers
-#######################################################################
 include(GrMiscUtils)
-GR_EXPAND_X_H(timing_utils timed_freq_xlating_fir_XXX  ccc ccf fcc fcf scf scc)
-GR_EXPAND_X_H(timing_utils tag_uhd_offset_X            c f s b)
-GR_EXPAND_X_H(timing_utils system_time_tagger_X          c f s b)
-GR_EXPAND_X_H(timing_utils system_time_diff_X          c f s b)
+
+list(APPEND include_sources
+    api.h
+    add_usrp_tags.h
+    interrupt_emitter.h
+    system_time_diff.h
+    system_time_tagger.h
+    tag_uhd_offset.h
+    uhd_timed_pdu_emitter.h
+    timed_freq_xlating_fir.h
+    thresh_trigger_f.h
+    constants.h
+)
 
 add_custom_target(timing_utils_generated_includes DEPENDS
     ${generated_includes}
@@ -34,12 +40,7 @@ add_custom_target(timing_utils_generated_includes DEPENDS
 # Install public header files
 ########################################################################
 install(FILES
-    ${generated_includes}
-    api.h
-    constants.h
-    clock_mm_tags_ff.h
-    add_usrp_tags_c.h
-    uhd_timed_pdu_emitter.h
-    interrupt_emitter.h
-    thresh_trigger_f.h DESTINATION include/timing_utils
+    ${include_sources}
+    wall_clock_time.h
+    time_delta.h DESTINATION include/timing_utils
 )

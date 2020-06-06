@@ -30,9 +30,9 @@
 
 class __GR_ATTR_EXPORT qa_timing_utils
 {
- public:
-  //! return suite of tests for all of gr-filter directory
-  static CppUnit::TestSuite *suite();
+public:
+    //! return suite of tests for all of gr-filter directory
+    static CppUnit::TestSuite* suite();
 };
 
 #endif /* _QA_TIMING_UTILS_H_ */

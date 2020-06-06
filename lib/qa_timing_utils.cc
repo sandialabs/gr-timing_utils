@@ -27,10 +27,9 @@
 
 #include "qa_timing_utils.h"
 
-CppUnit::TestSuite *
-qa_timing_utils::suite()
+CppUnit::TestSuite* qa_timing_utils::suite()
 {
-  CppUnit::TestSuite *s = new CppUnit::TestSuite("timing_utils");
+    CppUnit::TestSuite* s = new CppUnit::TestSuite("timing_utils");
 
-  return s;
+    return s;
 }

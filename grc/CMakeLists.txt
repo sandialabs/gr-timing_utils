@@ -17,17 +17,18 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 install(FILES
-    timing_utils_timed_freq_xlating_fir_XXX.xml
-    timing_utils_clock_mm_tags_ff.xml
-    timing_utils_retune_uhd_to_timed_tag.xml
-    timing_utils_add_usrp_tags_c.xml
-    timing_utils_tag_uhd_offset_X.xml
-    timing_utils_uhd_timed_pdu_emitter.xml
-    timing_utils_thresh_trigger_f.xml
-    timing_utils_edge_distance.xml
-    timing_utils_edge_detector_bb.xml
-    timing_utils_usrp_gps_time_sync.xml
-    timing_utils_interrupt_emitter.xml
-    timing_utils_system_time_diff_X.xml 
-    timing_utils_system_time_tagger_X.xml DESTINATION share/gnuradio/grc/blocks
+    timing_utils_timed_freq_xlating_fir.block.yml
+    timing_utils_retune_uhd_to_timed_tag.block.yml
+    timing_utils_add_usrp_tags.block.yml
+    timing_utils_tag_uhd_offset.block.yml
+    timing_utils_uhd_timed_pdu_emitter.block.yml
+    timing_utils_thresh_trigger_f.block.yml
+    timing_utils_edge_distance.block.yml
+    timing_utils_edge_detector_bb.block.yml
+    timing_utils_usrp_gps_time_sync.block.yml
+    timing_utils_interrupt_emitter.block.yml
+    timing_utils_system_time_diff.block.yml
+    timing_utils_system_time_tagger.block.yml
+    timing_utils_wall_clock_time.block.yml
+    timing_utils_time_delta.block.yml DESTINATION share/gnuradio/grc/blocks
 )

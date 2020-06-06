@@ -1,6 +1,8 @@
 /* -*- c++ -*- */
 /*
- * <COPYRIGHT PLACEHOLDER>
+ * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC
+ * (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
+ * Government retains certain rights in this software.
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,41 +20,55 @@
  * Boston, MA 02110-1301, USA.
  */
 
-
 #ifndef INCLUDED_TIMING_UTILS_THRESH_TRIGGER_F_H
 #define INCLUDED_TIMING_UTILS_THRESH_TRIGGER_F_H
 
-#include <timing_utils/api.h>
 #include <gnuradio/sync_block.h>
+#include <timing_utils/api.h>
 
 namespace gr {
-  namespace timing_utils {
+namespace timing_utils {
+
+/*!
+ * \brief <+description of block+>
+ * \ingroup timing_utils
+ *
+ */
+class TIMING_UTILS_API thresh_trigger_f : virtual public gr::sync_block
+{
+public:
+    typedef boost::shared_ptr<thresh_trigger_f> sptr;
 
     /*!
-     * \brief <+description of block+>
-     * \ingroup timing_utils
+     * \brief Return a shared_ptr to a new instance of timing_utils::thresh_trigger_f.
      *
+     * @param hi -
+     * @param lo -
+     * @param length -
      */
-    class TIMING_UTILS_API thresh_trigger_f : virtual public gr::sync_block
-    {
-     public:
-      typedef boost::shared_ptr<thresh_trigger_f> sptr;
+    static sptr make(float hi, float lo, int length);
 
-      /*!
-       * \brief Return a shared_ptr to a new instance of timing_utils::thresh_trigger_f.
-       *
-       * To avoid accidental use of raw pointers, timing_utils::thresh_trigger_f's
-       * constructor is in a private implementation
-       * class. timing_utils::thresh_trigger_f::make is the public interface for
-       * creating new instances.
-       */
-      static sptr make(float hi, float lo, int length);
-      virtual void set_hi(float t) = 0;
-      virtual void set_lo(float t) = 0;
-      virtual void set_len(int len) = 0;
-    };
+    /**
+     *
+     * @param t -
+     */
+    virtual void set_hi(float t) = 0;
 
-  } // namespace timing_utils
+    /**
+     *
+     * @param t -
+     */
+    virtual void set_lo(float t) = 0;
+
+    /**
+     *
+     * @param len -
+     */
+    virtual void set_len(int len) = 0;
+};
+
+} // namespace timing_utils
+  // namespace timing_utils
 } // namespace gr
 
 #endif /* INCLUDED_TIMING_UTILS_THRESH_TRIGGER_F_H */
