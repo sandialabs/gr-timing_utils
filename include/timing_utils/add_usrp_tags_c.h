@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+ * <COPYRIGHT PLACEHOLDER>
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,11 +45,38 @@ namespace gr {
        * constructor is in a private implementation
        * class. timing_utils::add_usrp_tags_c::make is the public interface for
        * creating new instances.
+       *
+       * \param freq Center frequency (Hz)
+       * \param rate Sampling rate (Hz)
+       * \param epoch_int Whole seconds of first sample
+       * \param epoch_frac Fractional seconds of first sample
+       *
+       * \return Pointer to new instance
+       */
+      static sptr make(double freq, double rate, uint64_t epoch_int, double epoch_frac);
+
+      /*! \brief Tag data stream now
+       *
+       * Tag the next sample out of the block
        */
       virtual void tag_now(uint32_t dummy) = 0;
+
+      /*! \brief Update the current tags
+       *
+       * Update the current tags being added
+       */
       virtual void update_tags(pmt::pmt_t update) = 0;
+
+      /*! \brief Last tag emitted
+       *
+       * Get the last set of tags emitted.  Additionally, the absolute index
+       * of the last sample tagged will be added to the dictionary with the
+       * key `rx_sample`
+       *
+       * \return pmt dictionary of last tags emitted
+       */
       virtual pmt::pmt_t last_tag() = 0;
-      static sptr make(double freq, double rate, uint64_t epoch_int, double epoch_frac);
+
     };
 
   } // namespace timing_utils

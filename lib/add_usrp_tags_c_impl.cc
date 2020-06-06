@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+ * <COPYRIGHT PLACEHOLDER>
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ namespace gr {
         d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_rate"), d_rate_pmt);
         d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_freq"), d_freq_pmt);
         d_pmt_dict = pmt::dict_add(d_pmt_dict, pmt::mp("rx_time"), d_time_pmt);
-        printf("Updating tags\n");
+        GR_LOG_DEBUG(d_logger,"Updating tags");
     }
 
     pmt::pmt_t add_usrp_tags_c_impl::last_tag() {

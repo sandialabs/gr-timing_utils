@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+ * <COPYRIGHT PLACEHOLDER>
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,21 +131,24 @@ namespace gr {
         pmt::pmt_t pmt_out = pmt::make_dict();
         pmt_out = pmt::dict_add(pmt_out, pmt::mp("trigger_time"), trigger_time);
         pmt_out = pmt::dict_add(pmt_out, pmt::mp("trigger_sample"), pmt::from_uint64(trigger_sample));
+        pmt_out = pmt::dict_add(pmt_out, pmt::mp("late_delta"), pmt::from_double(0));
         
         double current_time((boost::get_system_time() - epoch).total_microseconds()/1000000.0 - time_offset);
         double wait_time = t_int + t_frac - current_time;
         
         if (wait_time < 0) {
             if (d_drop_late) {
-                std::cout << "Dropping late interrupt request: " << wait_time << std::endl;
+                GR_LOG_DEBUG(d_logger, boost::format("Dropping late interrupt request: %0.2f") % wait_time);
             } else {
                 // Interrupt right now
                 if (debug) std::cout << "Sending late message\n";
+                std::cout << "interrupt_emitter sending late message, wait time is " << wait_time << std::endl;
                 // Modify the time that goes out to be right now.  Since this is a real time interrupt system
                 // bad things can happen if we go off of the sample time rather than clock time.
-                pmt::pmt_t p_int = pmt::from_uint64(int(current_time));
-                pmt::pmt_t p_frac = pmt::from_double(current_time - int(current_time));
-                pmt_out = pmt::dict_add(pmt_out, pmt::mp("trigger_time"), pmt::cons(p_int, p_frac));
+                //pmt::pmt_t p_int = pmt::from_uint64(int(current_time));
+                //pmt::pmt_t p_frac = pmt::from_double(current_time - int(current_time));
+                //pmt_out = pmt::dict_add(pmt_out, pmt::mp("trigger_time"), pmt::cons(p_int, p_frac));
+                pmt_out = pmt::dict_add(pmt_out, pmt::mp("late_delta"), pmt::from_double((wait_time*-1.0)));
                 io.dispatch(boost::bind(&interrupt_emitter_impl::StartTimer, this, 0, pmt_out));
             }
         } else {

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+ * <COPYRIGHT PLACEHOLDER>
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -109,10 +109,33 @@ namespace gr {
            */
           virtual double rate() const = 0;
 
+          /*! \brief Set center frequency
+           *
+           * All tune requests are based on an assumed center frequency
+           * for the incoming data.
+           *
+           * \param center_freq Center frequency (Hz)
+           */
           virtual void set_center_freq(double center_freq) = 0;
+
+          /*! \brief Get center frequency
+           *
+           * \return Center frequency (Hz)
+           */
           virtual double center_freq() const = 0;
 
+          /*! \brief Set taps
+           *
+           * Set the FIR filter taps
+           *
+           * \param taps FIR filter taps
+           */
           virtual void set_taps(const std::vector<@TAP_TYPE@> &taps) = 0;
+
+          /*! \brief Get FIR filter taps
+           *
+           * \return Filter taps
+           */
           virtual std::vector<@TAP_TYPE@> taps() const = 0;
         };
 
