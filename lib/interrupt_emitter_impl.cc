@@ -71,6 +71,8 @@ bool interrupt_emitter_impl<T>::start()
     time_offset = (boost::get_system_time() - epoch).total_microseconds() * 1e-6;
     last_time =
         boost::get_system_time() - boost::posix_time::microseconds(1e6 * time_offset);
+
+    return true;
 }
 
 /*
