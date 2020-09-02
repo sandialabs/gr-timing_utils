@@ -155,8 +155,12 @@ add_subdirectory(include/timing_utils)
 add_subdirectory(lib)
 add_subdirectory(apps)
 add_subdirectory(docs)
-add_subdirectory(swig)
-add_subdirectory(python)
+
+if (ENABLE_PYTHON)
+    add_subdirectory(swig)
+    add_subdirectory(python)
+endif(ENABLE_PYTHON)
+
 add_subdirectory(grc)
 
 ########################################################################
