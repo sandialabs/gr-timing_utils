@@ -1,14 +1,19 @@
 title: GNU Radio Timing Utilities
-brief: Functions to support timing within GNU Radio SDR environment.
-tags: # Tags are arbitrary, but look at CGRAN what other authors are using
-  - sdr
+brief: Tools for advanced timing within GR
+tags:
   - PDU
-  - timing
+  - Timing
+  - UHD
 author:
-  - Sandia National Laboratories <address@hidden>
+  - Sandia National Laboratories
+  - Jacob Gilbert
+  - Peter Knee
+  - Sam Whiting
 copyright_owner:
-  - National Technology & Engineering Solutions of Sandia, LLC (NTESS)
+  - NTESS, LLC
 license:
-repo: https://github.com/sandialabs/gr-timing_utils
+gr_supported_version: v3.7, v3.8
+#repo: https://github.com/sandialabs/gr-timing_utils
+#icon: https://github.com/sandialabs/gr-timing_utils/docs/time.jpg
 ---
 
