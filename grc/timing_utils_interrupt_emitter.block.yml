@@ -5,6 +5,14 @@ label: Interrupt Emitter
 category: '[Sandia]/Timing Utilities'
 
 parameters:
+-   id: type
+    label: Type
+    dtype: enum
+    options: [c, f, i, s, b]
+    option_labels: [Complex, Float, Int, Short, Byte]
+    option_attributes:
+        type: [complex, float, int, short, byte]
+    hide: part
 -   id: rate
     label: Sample Rate
     dtype: float
@@ -16,7 +24,7 @@ parameters:
 
 inputs:
 -   domain: stream
-    dtype: complex
+    dtype: ${ type.input }
 -   domain: message
     id: set
     optional: true
@@ -28,6 +36,6 @@ outputs:
 
 templates:
     imports: import timing_utils
-    make: timing_utils.interrupt_emitter(${rate}, ${late_pdu_mode})
+    make: timing_utils.interrupt_emitter_${type}(${rate}, ${late_pdu_mode})
 
 file_format: 1

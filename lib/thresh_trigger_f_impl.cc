@@ -1,31 +1,18 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC
- * (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
+ * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
-
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "thresh_trigger_f_impl.h"
+#include <timing_utils/constants.h>
 #include <gnuradio/io_signature.h>
 
 namespace gr {
@@ -51,9 +38,9 @@ thresh_trigger_f_impl::thresh_trigger_f_impl(float hi, float lo, int length)
       d_length_thresh(length),
       d_length(0)
 {
-    message_port_register_out(pmt::mp("trig"));
-    message_port_register_in(pmt::mp("disarm"));
-    set_msg_handler(pmt::mp("disarm"),
+    message_port_register_out(PMTCONSTSTR__TRIG);
+    message_port_register_in(PMTCONSTSTR__DISARM);
+    set_msg_handler(PMTCONSTSTR__DISARM,
                     boost::bind(&thresh_trigger_f_impl::disarm, this, _1));
 }
 
@@ -90,8 +77,8 @@ int thresh_trigger_f_impl::work(int noutput_items,
             d_blank = true;
             d_length++;
             if (d_length == d_length_thresh) {
-                message_port_pub(pmt::mp("trig"),
-                                 pmt::cons(pmt::mp("trigger_now"), pmt::PMT_NIL));
+                message_port_pub(PMTCONSTSTR__TRIG,
+                                 pmt::cons(PMTCONSTSTR__TRIG_NOW, pmt::PMT_NIL));
                 // std::cout << "TRIGGERED at offset " << (nitems_read(0) + ii) <<
                 // std::endl;
             }

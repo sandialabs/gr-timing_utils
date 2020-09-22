@@ -2,20 +2,7 @@
 #
 # This file is part of GNU Radio
 #
-# GNU Radio is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3, or (at your option)
-# any later version.
-#
-# GNU Radio is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with GNU Radio; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street,
-# Boston, MA 02110-1301, USA.
+# SPDX-License-Identifier: GPL-3.0-or-later
 install(FILES
     timing_utils_timed_freq_xlating_fir.block.yml
     timing_utils_retune_uhd_to_timed_tag.block.yml
@@ -30,5 +17,7 @@ install(FILES
     timing_utils_system_time_diff.block.yml
     timing_utils_system_time_tagger.block.yml
     timing_utils_wall_clock_time.block.yml
-    timing_utils_time_delta.block.yml DESTINATION share/gnuradio/grc/blocks
+    timing_utils_time_delta.block.yml
+    timing_utils_timed_tag_retuner.block.yml 
+    timing_utils_timed_cordic_emulator.block.yml DESTINATION share/gnuradio/grc/blocks
 )

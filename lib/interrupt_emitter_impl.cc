@@ -1,31 +1,18 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC
- * (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
+ * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
-
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "interrupt_emitter_impl.h"
+#include <timing_utils/constants.h>
 #include <gnuradio/io_signature.h>
 #include <cmath>
 
@@ -51,11 +38,11 @@ interrupt_emitter_impl<T>::interrupt_emitter_impl(double rate, bool drop_late)
       d_rate(rate),
       d_drop_late(drop_late)
 {
-    this->message_port_register_out(pmt::mp("trig"));
-    this->message_port_register_in(pmt::mp("set"));
+    this->message_port_register_out(PMTCONSTSTR__TRIG);
+    this->message_port_register_in(PMTCONSTSTR__SET);
 
     this->set_msg_handler(
-        pmt::mp("set"),
+        PMTCONSTSTR__SET,
         boost::bind(&interrupt_emitter_impl<T>::handle_set_time, this, _1));
 
     boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
@@ -69,8 +56,8 @@ template <class T>
 bool interrupt_emitter_impl<T>::start()
 {
     time_offset = (boost::get_system_time() - epoch).total_microseconds() * 1e-6;
-    last_time =
-        boost::get_system_time() - boost::posix_time::microseconds(1e6 * time_offset);
+    last_time = boost::get_system_time() -
+                boost::posix_time::microseconds(static_cast<long>(1e6 * time_offset));
 
     return true;
 }
@@ -81,7 +68,6 @@ bool interrupt_emitter_impl<T>::start()
 template <class T>
 interrupt_emitter_impl<T>::~interrupt_emitter_impl()
 {
-    stop();
     delete timer_thread;
 }
 
@@ -149,10 +135,10 @@ void interrupt_emitter_impl<T>::handle_set_time(pmt::pmt_t time_pmt)
         return;
 
     pmt::pmt_t pmt_out = pmt::make_dict();
-    pmt_out = pmt::dict_add(pmt_out, pmt::mp("trigger_time"), trigger_time);
+    pmt_out = pmt::dict_add(pmt_out, PMTCONSTSTR__TRIG_TIME, trigger_time);
     pmt_out = pmt::dict_add(
-        pmt_out, pmt::mp("trigger_sample"), pmt::from_uint64(trigger_sample));
-    pmt_out = pmt::dict_add(pmt_out, pmt::mp("late_delta"), pmt::from_double(0));
+        pmt_out, PMTCONSTSTR__TRIG_SAMP, pmt::from_uint64(trigger_sample));
+    pmt_out = pmt::dict_add(pmt_out, PMTCONSTSTR__LATE_DELTA, pmt::from_double(0));
 
     double current_time((boost::get_system_time() - epoch).total_microseconds() /
                             1000000.0 -
@@ -172,7 +158,7 @@ void interrupt_emitter_impl<T>::handle_set_time(pmt::pmt_t time_pmt)
             // interrupt system bad things can happen if we go off of the sample time
             // rather than clock time.
             pmt_out = pmt::dict_add(
-                pmt_out, pmt::mp("late_delta"), pmt::from_double((wait_time * -1.0)));
+                pmt_out, PMTCONSTSTR__LATE_DELTA, pmt::from_double((wait_time * -1.0)));
             io.dispatch(
                 boost::bind(&interrupt_emitter_impl<T>::StartTimer, this, 0, pmt_out));
         }
@@ -189,18 +175,18 @@ bool interrupt_emitter_impl<T>::stop()
 {
     io.dispatch(boost::bind(&interrupt_emitter_impl<T>::StopTimer, this));
     timer_thread->join();
+
     return true;
 }
 
 template <class T>
 void interrupt_emitter_impl<T>::process_interrupt()
 {
-    pmt::pmt_t time_pmt = pmt::dict_ref(d_out_pmt, pmt::mp("trigger_time"), pmt::PMT_NIL);
+    pmt::pmt_t time_pmt = pmt::dict_ref(d_out_pmt, PMTCONSTSTR__TRIG_TIME, pmt::PMT_NIL);
     double int_time =
         pmt::to_uint64(pmt::car(time_pmt)) + pmt::to_double(pmt::cdr(time_pmt));
-    d_out_pmt = pmt::dict_add(d_out_pmt,
-                              pmt::mp("trigger_sample"),
-                              pmt::from_uint64(time_to_samples(int_time)));
+    d_out_pmt = pmt::dict_add(
+        d_out_pmt, PMTCONSTSTR__TRIG_SAMP, pmt::from_uint64(time_to_samples(int_time)));
     this->message_port_pub(pmt::mp("trig"), d_out_pmt);
 }
 
@@ -209,9 +195,11 @@ int interrupt_emitter_impl<T>::work(int noutput_items,
                                     gr_vector_const_void_star& input_items,
                                     gr_vector_void_star& output_items)
 {
-    // Assume that the current time corresponds with 1 sample after the end of the buffer
+    // Assume that the current time corresponds with 1 sample after the end of the
+    // buffer
     boost::posix_time::ptime current_ptime =
-        boost::get_system_time() - boost::posix_time::microseconds(1e6 * time_offset);
+        boost::get_system_time() -
+        boost::posix_time::microseconds(static_cast<long>(1e6 * time_offset));
     double current_time((current_ptime - epoch).total_microseconds() / 1e6);
     d_start_sample = this->nitems_read(0) + noutput_items;
     d_start_time = current_time;
@@ -225,7 +213,7 @@ int interrupt_emitter_impl<T>::work(int noutput_items,
                             0,
                             this->nitems_read(0),
                             (this->nitems_read(0) + noutput_items),
-                            pmt::mp("rx_time"));
+                            PMTCONSTSTR__RX_TIME);
     if (tags.size()) {
         // Only need to look at the last one
         tag_t last_tag = tags[tags.size() - 1];
@@ -235,14 +223,14 @@ int interrupt_emitter_impl<T>::work(int noutput_items,
         // printf("Tag at time: %f, sample: %ld, offset: %f, time:%f\n", t_int+t_frac,
         // samp, time_offset, current_time);
         // What time did we expect to see samp at??
-        // Note that we expect to receive the whole buffer at the same time, so we need to
-        // reref to the last sample
+        // Note that we expect to receive the whole buffer at the same time, so we
+        // need to reref to the last sample
         double expect_samp =
             current_time - (this->nitems_read(0) + noutput_items - samp) / d_rate;
         double error = expect_samp - t_int - t_frac;
         time_offset += error;
         d_start_time -= error;
-        current_ptime -= boost::posix_time::microseconds(1e6 * error);
+        current_ptime -= boost::posix_time::microseconds(static_cast<long>(1e6 * error));
         UpdateTimer(error);
         if (debug)
             printf("tag_error = %f\n", error);
@@ -255,7 +243,8 @@ int interrupt_emitter_impl<T>::work(int noutput_items,
             // Allow for some sample error, because the system clock isn't perfect
             time_offset += error;
             d_start_time -= error;
-            current_ptime -= boost::posix_time::microseconds(1e6 * error);
+            current_ptime -=
+                boost::posix_time::microseconds(static_cast<long>(1e6 * error));
             if (debug)
                 printf("sample_error (ms) = %f, items = %d, last_error = %f\n",
                        1e3 * error,

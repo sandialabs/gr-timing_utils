@@ -1,42 +1,46 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC 
-# (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. 
-# Government retains certain rights in this software.
+# Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of Sandia, LLC
+# (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government
+# retains certain rights in this software.
 #
-# This is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3, or (at your option)
-# any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this software; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street,
-# Boston, MA 02110-1301, USA.
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 from retune_uhd_to_timed_tag import retune_uhd_to_timed_tag
+import pmt
+
 
 class qa_retune_uhd_to_timed_tag (gr_unittest.TestCase):
 
-    def setUp (self):
-        self.tb = gr.top_block ()
+    def setUp(self):
+        self.tb = gr.top_block()
 
-    def tearDown (self):
+    def tearDown(self):
         self.tb = None
 
-    def test_001_t (self):
-        # set up fg
-        self.tb.run ()
-        # check data
+    def test_001_instantiate(self):
+
+        # data
+        src_data = (1 + 1j, 2 + 2j, 3 + 3j)
+        expected_result = (1 + 1j, 2 + 2j, 3 + 3j)
+
+        # blocks
+        src = blocks.vector_source_c(src_data)
+        cts = retune_uhd_to_timed_tag(1e6, pmt.intern("haha"), 1, 0.1)
+        dst = blocks.vector_sink_c()
+        self.tb.connect(src, cts)
+        self.tb.connect(cts, dst)
+
+        self.tb.run()
+        result_data = dst.data()
+
+        # assert
+        print("got {}, expected {}".format(result_data, expected_result))
+        self.assertEqual(expected_result, result_data)
 
 
 if __name__ == '__main__':

@@ -1,31 +1,18 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC
- * (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
+ * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
-
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "uhd_timed_pdu_emitter_impl.h"
+#include <timing_utils/constants.h>
 #include <gnuradio/io_signature.h>
 
 namespace gr {
@@ -51,10 +38,10 @@ uhd_timed_pdu_emitter_impl::uhd_timed_pdu_emitter_impl(float rate, bool drop_lat
     // start time is zero
     d_start_time = to_tpmt(0, 0.0);
 
-    message_port_register_out(pmt::mp("trig"));
-    message_port_register_in(pmt::mp("set"));
+    message_port_register_out(PMTCONSTSTR__TIME);
+    message_port_register_in(PMTCONSTSTR__SET);
 
-    set_msg_handler(pmt::mp("set"),
+    set_msg_handler(PMTCONSTSTR__SET,
                     boost::bind(&uhd_timed_pdu_emitter_impl::handle_set_time, this, _1));
 }
 
@@ -186,9 +173,9 @@ void uhd_timed_pdu_emitter_impl::handle_set_time(pmt::pmt_t time_pmt)
 
     // build the output PMT dictionary
     d_pmt_out = pmt::make_dict();
-    d_pmt_out = pmt::dict_add(d_pmt_out, pmt::mp("trigger_time"), trigger_time);
-    d_pmt_out = pmt::dict_add(
-        d_pmt_out, pmt::mp("trigger_sample"), pmt::from_double(d_trigger_samp));
+    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__TRIG_TIME, trigger_time);
+    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__TRIG_SAMP, pmt::from_double(d_trigger_samp));
+    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__LATE_DELTA, pmt::from_double(0));
     d_armed = true;
     // std::cout << "ARMED! FOR TIME " << d_pmt_out << std::endl;
 }
@@ -208,10 +195,10 @@ int uhd_timed_pdu_emitter_impl::work(int noutput_items,
             // check if we are late to trigger
             if (d_trigger_samp < nitems_read(0)) {
                 if (!d_drop_late) {
-                    message_port_pub(pmt::mp("trig"), d_pmt_out);
+                    message_port_pub(PMTCONSTSTR__TRIG, d_pmt_out);
                 }
             } else {
-                message_port_pub(pmt::mp("trig"), d_pmt_out);
+                message_port_pub(PMTCONSTSTR__TRIG, d_pmt_out);
             }
             d_armed = false;
         }
@@ -219,7 +206,7 @@ int uhd_timed_pdu_emitter_impl::work(int noutput_items,
 
     // check for uhd rx_time tags to set baseline time and correct for overflows
     get_tags_in_range(
-        tags, 0, nitems_read(0), (nitems_read(0) + noutput_items), pmt::mp("rx_time"));
+        tags, 0, nitems_read(0), (nitems_read(0) + noutput_items), PMTCONSTSTR__RX_TIME);
     if (tags.size()) {
         for (int ii = 0; ii < tags.size(); ii++) {
             pmt::pmt_t tpmt = pmt::cons(pmt::tuple_ref(tags[ii].value, 0),

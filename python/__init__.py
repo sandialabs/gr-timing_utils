@@ -1,19 +1,7 @@
 #
 # Copyright 2008,2009 Free Software Foundation, Inc.
 #
-# This application is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3, or (at your option)
-# any later version.
-#
-# This application is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 # The presence of this file turns this directory into a Python package
@@ -36,3 +24,4 @@ from .retune_uhd_to_timed_tag import retune_uhd_to_timed_tag
 from .edge_distance import edge_distance
 from .edge_detector_bb import *
 from .usrp_gps_time_sync import usrp_gps_time_sync
+from .uhd_timed_cordic_emulator import uhd_timed_cordic_emulator

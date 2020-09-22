@@ -9,11 +9,13 @@ author:
   - Jacob Gilbert
   - Peter Knee
   - Sam Whiting
+  - Brian Adams
 copyright_owner:
   - NTESS, LLC
-license:
+license: 
 gr_supported_version: v3.7, v3.8
+dependencies: gr-pdu_utils
 #repo: https://github.com/sandialabs/gr-timing_utils
-#icon: https://github.com/sandialabs/gr-timing_utils/docs/time.jpg
+#icon: https://raw.githubusercontent.com/sandialabs/gr-timing_utils/master/docs/time.jpg
 ---
-
+This module has blocks helpful for time management within GR applications, primarily using UHD style time tags.

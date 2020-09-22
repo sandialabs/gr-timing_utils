@@ -1,23 +1,10 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC
- * (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. \
+ * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #ifdef HAVE_CONFIG_H
@@ -190,6 +177,12 @@ void timed_freq_xlating_fir_impl<I, O, T>::set_taps(const std::vector<T>& taps)
 template <class I, class O, class T>
 void timed_freq_xlating_fir_impl<I, O, T>::set_taps_(const std::vector<T>& taps)
 {
+    if (taps.size() == 0) {
+        throw std::out_of_range(
+            str(boost::format("timed_freq_xlating_fir_impl: invalid "
+                              "number of taps.  must be greater than zero")));
+    }
+
     if (taps.size() <= MAX_NUM_TAPS) {
         d_proto_taps = taps;
         d_updated = true;
@@ -221,6 +214,37 @@ void timed_freq_xlating_fir_impl<I, O, T>::handle_set_center_freq(pmt::pmt_t msg
             double freq = pmt::to_double(x);
             set_center_freq_(freq);
         }
+    }
+}
+
+template <class I, class O, class T>
+void timed_freq_xlating_fir_impl<I, O, T>::scale(std::vector<gr_complex>& output,
+                                                 gr_complex* input)
+{
+    volk_32fc_s32fc_multiply_32fc(&output[0], &input[0], d_ctaps[0], output.size());
+}
+
+
+template <class I, class O, class T>
+void timed_freq_xlating_fir_impl<I, O, T>::scale(std::vector<gr_complex>& output,
+                                                 float* input)
+{
+    std::vector<float> real(output.size()), imag(output.size());
+    volk_32f_s32f_multiply_32f(&real[0], &input[0], d_ctaps[0].real(), output.size());
+    volk_32f_s32f_multiply_32f(&imag[0], &input[0], d_ctaps[0].imag(), output.size());
+    volk_32f_x2_interleave_32fc(&output[0], &real[0], &imag[0], output.size());
+
+    return;
+}
+
+template <class I, class O, class T>
+void timed_freq_xlating_fir_impl<I, O, T>::scale(std::vector<gr_complex>& output,
+                                                 short* input)
+{
+    // no volk kernel so do by hand
+    // TODO: could use volk_16i_s32f_convert_32f on real/imag portions separately
+    for (int i = 0; i < output.size(); ++i) {
+        output[i] = static_cast<gr_complex>(input[i]) * d_ctaps[0];
     }
 }
 
@@ -297,11 +321,29 @@ int timed_freq_xlating_fir_impl<I, O, T>::work(int noutput_items,
 
     // the magic
     std::vector<O> tmp(produced);
-    unsigned j = 0;
-    for (int i = 0; i < produced; i++) {
-        // out[i] = d_r.rotate(d_composite_fir->filter(&in[j]));
-        tmp[i] = d_composite_fir->filter(&in[j]);
-        j += this->decimation();
+    unsigned decimation = this->decimation();
+    if (d_ctaps.size() > 1) {
+        // any taps at all, we must filter
+        unsigned j = 0;
+        for (int i = 0; i < produced; i++) {
+            // out[i] = d_r.rotate(d_composite_fir->filter(&in[j]));
+            tmp[i] = d_composite_fir->filter(&in[j]);
+            j += decimation;
+        }
+    } else {
+        if (decimation == 1) {
+            // scale only required
+            this->scale(tmp, in);
+        } else {
+            // decimate then scale
+            std::vector<O> scaled(produced);
+            unsigned j = 0;
+            for (int i = 0; i < produced; ++i) {
+                tmp[i] = static_cast<O>(in[j]);
+                j += decimation;
+            }
+            this->scale(tmp, &scaled[0]);
+        }
     }
 
     // only supported output type is gr_complex so this is safe

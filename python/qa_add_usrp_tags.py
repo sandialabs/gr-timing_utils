@@ -1,24 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC 
-# (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. 
-# Government retains certain rights in this software.
+# Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of Sandia, LLC
+# (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government
+# retains certain rights in this software.
 #
-# This is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3, or (at your option)
-# any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this software; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street,
-# Boston, MA 02110-1301, USA.
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 from builtins import range
@@ -35,11 +22,6 @@ class qa_add_usrp_tags (gr_unittest.TestCase):
 
     def tearDown (self):
         self.tb = None
-
-    def test_001_t (self):
-        # set up fg
-        self.tb.run ()
-        # check data
 
     def makeDict(self, **kwargs):
         pmtDict = pmt.make_dict()
@@ -59,16 +41,36 @@ class qa_add_usrp_tags (gr_unittest.TestCase):
         self.throttle = blocks.throttle(gr.sizeof_gr_complex*1, 250000)
         self.utag = timing_utils.add_usrp_tags_c(1090e6, 250000, 0, start_time)
         self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "");
+        
         self.tb.connect((self.src, 0), (self.throttle, 0))
         self.tb.connect((self.throttle, 0), (self.utag, 0))
         self.tb.connect((self.utag, 0), (self.tag_dbg, 0))
+        
         self.tb.start()
         time.sleep(.01)
+        #print("Dumping tags")
+        for t in self.tag_dbg.current_tags():
+            #print( 'Tag:' , t.key, ' ', t.value )
+            if pmt.eq(t.key, pmt.intern("rx_freq")):
+                self.assertAlmostEqual( 1090e6, pmt.to_double(t.value) )
+            if pmt.eq(t.key, pmt.intern("rx_rate")):
+                self.assertAlmostEqual( 250000, pmt.to_double(t.value) )
+            
+                
 
         self.utag.update_tags(self.makeDict(freq=1091e6, rate=260000, epoch_int=0, epoch_frac=start_time+.3))
+        time.sleep(.01)
+        #print("Dumping tags")
+        for t in self.tag_dbg.current_tags():
+            #print( 'Tag:' , t.key, ' ', t.value )
+            if pmt.eq(t.key, pmt.intern("rx_freq")):
+                self.assertAlmostEqual( 1091e6, pmt.to_double(t.value) )
+            if pmt.eq(t.key, pmt.intern("rx_rate")):
+                self.assertAlmostEqual( 260000, pmt.to_double(t.value) )
+
         time.sleep(.1)
         self.tb.stop()
-
+        
 
 if __name__ == '__main__':
     gr_unittest.run(qa_add_usrp_tags)

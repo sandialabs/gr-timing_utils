@@ -1,24 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 National Technology & Engineering Solutions of Sandia, LLC 
-# (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. 
-# Government retains certain rights in this software.
+# Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of Sandia, LLC
+# (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government
+# retains certain rights in this software.
 #
-# This is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3, or (at your option)
-# any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this software; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street,
-# Boston, MA 02110-1301, USA.
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 from builtins import range
@@ -26,6 +13,7 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import timing_utils_swig as timing_utils
 import time
+import pmt
 
 class qa_system_time_diff (gr_unittest.TestCase):
 
@@ -48,11 +36,41 @@ class qa_system_time_diff (gr_unittest.TestCase):
         # set up fg
         self.tb.run ()
         time.sleep(0.05)
+        
+    def test_002_tags(self): 
+        start_time = 0.1
+        self.duration = 125000
+        tnow = time.time()
+        
+        src_tag = gr.tag_utils.python_to_tag([0, pmt.intern("wall_clock_time"), pmt.from_double(tnow - 10000), pmt.intern("test_002_tags")])
+        self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [src_tag])
+        self.throttle = blocks.throttle(gr.sizeof_gr_complex*1, 250000)
+        self.dut = timing_utils.system_time_diff_c(True, True, False)
+        self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "");
+        
+        self.tb.connect((self.src, 0), (self.throttle, 0))
+        self.tb.connect((self.throttle, 0), (self.dut, 0))
+        self.tb.connect((self.dut, 0), (self.tag_dbg, 0))
+        
+        self.tb.start()
+        time.sleep(.01)
+        
+        tags = self.tag_dbg.current_tags();
+        print("Dumping tags")
+        for t in tags:
+            print( 'Tag:' , t.key, ' ', t.value )
+            if pmt.eq(t.key, pmt.intern("wall_clock_time")):
+                time_tag = t;
+        
+        if time_tag:
+            self.assertAlmostEqual( tnow, pmt.to_double(time_tag.value), delta=60 )
+        else:
+            self.assertTrue( False )
 
-        # check data
+        time.sleep(.1)
+        self.tb.stop()
 
-        # break down
-        self.tb = None
+       
 
 if __name__ == '__main__':
     gr_unittest.run(qa_system_time_diff)

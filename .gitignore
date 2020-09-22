@@ -13,6 +13,8 @@
 # Temp VI files #
 #################
 *~
+*.swp
+*.bak
 
 # Packages #
 ############

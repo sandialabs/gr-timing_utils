@@ -19,6 +19,7 @@
 #include "timing_utils/system_time_diff.h"
 #include "timing_utils/wall_clock_time.h"
 #include "timing_utils/time_delta.h"
+#include "timing_utils/timed_tag_retuner.h"
 %}
 
 %include "timing_utils/constants.h"
@@ -76,3 +77,5 @@ GR_SWIG_BLOCK_MAGIC2_TMPL(timing_utils, system_time_diff_c, system_time_diff<gr_
 GR_SWIG_BLOCK_MAGIC2(timing_utils, wall_clock_time);
 %include "timing_utils/time_delta.h"
 GR_SWIG_BLOCK_MAGIC2(timing_utils, time_delta);
+%include "timing_utils/timed_tag_retuner.h"
+GR_SWIG_BLOCK_MAGIC2(timing_utils, timed_tag_retuner);
