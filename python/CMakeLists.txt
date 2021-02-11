@@ -15,14 +15,24 @@ endif()
 ########################################################################
 # Install python sources
 ########################################################################
-GR_PYTHON_INSTALL(
-    FILES
+set(pyfiles
     __init__.py
     retune_uhd_to_timed_tag.py
     edge_distance.py
     edge_detector_bb.py
     usrp_gps_time_sync.py 
-    uhd_timed_cordic_emulator.py DESTINATION ${GR_PYTHON_DIR}/timing_utils
+    uhd_timed_cordic_emulator.py
+)
+
+# copy all python files to local package for testing
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/python/timing_utils)
+foreach(file ${pyfiles})
+   configure_file(${file} ${CMAKE_BINARY_DIR}/python/timing_utils COPYONLY)
+endforeach()
+
+GR_PYTHON_INSTALL(
+    FILES ${pyfiles}
+    DESTINATION ${GR_PYTHON_DIR}/timing_utils
 )
 
 ########################################################################
@@ -31,7 +41,7 @@ GR_PYTHON_INSTALL(
 include(GrTest)
 
 set(GR_TEST_TARGET_DEPS gnuradio-timing_utils)
-set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/swig)
+set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/python)
 GR_ADD_TEST(qa_timed_freq_xlating_fir ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_timed_freq_xlating_fir.py)
 GR_ADD_TEST(qa_retune_uhd_to_timed_tag ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_retune_uhd_to_timed_tag.py)
 GR_ADD_TEST(qa_add_usrp_tags ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_add_usrp_tags.py)
@@ -42,3 +52,4 @@ GR_ADD_TEST(qa_wall_clock_time ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/
 GR_ADD_TEST(qa_time_delta ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_time_delta.py)
 GR_ADD_TEST(qa_system_time_tagger ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_system_time_tagger.py)
 GR_ADD_TEST(qa_timed_tag_retuner ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_timed_tag_retuner.py)
+GR_ADD_TEST(qa_constants ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_constants.py)

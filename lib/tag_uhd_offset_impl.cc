@@ -33,7 +33,7 @@ tag_uhd_offset_impl<T>::tag_uhd_offset_impl(float rate, uint32_t tag_interval)
                      gr::io_signature::make(1, 1, sizeof(T)),
                      gr::io_signature::make(1, 1, sizeof(T))),
       d_rate(rate),
-      d_key(PMTCONSTSTR__RX_TIME),
+      d_key(PMTCONSTSTR__rx_time()),
       d_total_nitems_read(0),
       d_time_tag_offset(0),
       d_time_tag_int_sec(0),
@@ -43,7 +43,7 @@ tag_uhd_offset_impl<T>::tag_uhd_offset_impl(float rate, uint32_t tag_interval)
     set_interval(tag_interval);
     GR_LOG_INFO(this->d_logger, "setting up time tagger");
 
-    this->message_port_register_out(PMTCONSTSTR__TIME);
+    this->message_port_register_out(PMTCONSTSTR__time());
 }
 
 /*
@@ -122,14 +122,14 @@ int tag_uhd_offset_impl<T>::work(int noutput_items,
                             0,
                             this->nitems_read(0),
                             (this->nitems_read(0) + noutput_items),
-                            PMTCONSTSTR__RX_TIME);
+                            PMTCONSTSTR__rx_time());
     if (tags.size()) {
         for (int ii = 0; ii < tags.size(); ii++) {
             set_time_tag(tags[ii]);
             this->add_item_tag(0, tags[ii].offset, d_key, d_time_tag);
             // GR_LOG_INFO(this->d_logger, boost::format("TAGGG! at sample %d") %
             // d_time_tag_offset);
-            this->message_port_pub(PMTCONSTSTR__TIME, pmt::cons(d_key, d_time_tag));
+            this->message_port_pub(PMTCONSTSTR__time(), pmt::cons(d_key, d_time_tag));
             d_next_tag_offset = tags[ii].offset + d_interval;
         }
     }

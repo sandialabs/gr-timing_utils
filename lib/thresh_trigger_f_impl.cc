@@ -38,9 +38,9 @@ thresh_trigger_f_impl::thresh_trigger_f_impl(float hi, float lo, int length)
       d_length_thresh(length),
       d_length(0)
 {
-    message_port_register_out(PMTCONSTSTR__TRIG);
-    message_port_register_in(PMTCONSTSTR__DISARM);
-    set_msg_handler(PMTCONSTSTR__DISARM,
+    message_port_register_out(PMTCONSTSTR__trig());
+    message_port_register_in(PMTCONSTSTR__disarm());
+    set_msg_handler(PMTCONSTSTR__disarm(),
                     boost::bind(&thresh_trigger_f_impl::disarm, this, _1));
 }
 
@@ -77,8 +77,8 @@ int thresh_trigger_f_impl::work(int noutput_items,
             d_blank = true;
             d_length++;
             if (d_length == d_length_thresh) {
-                message_port_pub(PMTCONSTSTR__TRIG,
-                                 pmt::cons(PMTCONSTSTR__TRIG_NOW, pmt::PMT_NIL));
+                message_port_pub(PMTCONSTSTR__trig(),
+                                 pmt::cons(PMTCONSTSTR__trigger_now(), pmt::PMT_NIL));
                 // std::cout << "TRIGGERED at offset " << (nitems_read(0) + ii) <<
                 // std::endl;
             }

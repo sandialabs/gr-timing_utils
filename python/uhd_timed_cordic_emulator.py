@@ -12,9 +12,9 @@ from gnuradio import gr
 from gnuradio import blocks
 from gnuradio import filter
 import sandia_utils
-import timing_utils
 import pmt
 import numpy
+import timing_utils
 
 
 DECIMATE_IN_FREQ_XLATING_FILTER = 1
@@ -58,7 +58,7 @@ class uhd_timed_cordic_emulator(gr.hier_block2):
         self.deint = sandia_utils.interleaved_short_to_complex(False, False, 1.0 / pow(2, 15))
         self.throttle = blocks.throttle(gr.sizeof_gr_complex * 1, samp_rate, True)
         self.tagger = timing_utils.add_usrp_tags_c(fc_start, samp_rate, int(start_time), (start_time - int(start_time)))
-        self.tuner = timing_utils.retune_uhd_to_timed_tag(int(samp_rate), pmt.intern('dsp_freq'), int(start_time), (start_time - int(start_time)))
+        self.tuner = timing_utils.retune_uhd_to_timed_tag(int(samp_rate), timing_utils.PMTCONSTSTR__dsp_freq(), int(start_time), (start_time - int(start_time)))
         if DECIMATE_IN_FREQ_XLATING_FILTER:
             self.filt = timing_utils.timed_freq_xlating_fir_ccf(decimation, (taps), fc_start, samp_rate)
         else:

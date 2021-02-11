@@ -65,9 +65,9 @@ timed_freq_xlating_fir_impl<I, O, T>::timed_freq_xlating_fir_impl(
     // set tag pmt
     d_tag_pmt = pmt::string_to_symbol(d_tag_key);
 
-    this->message_port_register_in(PMTCONSTSTR__FREQ);
+    this->message_port_register_in(PMTCONSTSTR__freq());
     this->set_msg_handler(
-        PMTCONSTSTR__FREQ,
+        PMTCONSTSTR__freq(),
         boost::bind(
             &timed_freq_xlating_fir_impl<I, O, T>::handle_set_center_freq, this, _1));
 
@@ -202,8 +202,8 @@ std::vector<T> timed_freq_xlating_fir_impl<I, O, T>::taps() const
 template <class I, class O, class T>
 void timed_freq_xlating_fir_impl<I, O, T>::handle_set_center_freq(pmt::pmt_t msg)
 {
-    if (pmt::is_dict(msg) && pmt::dict_has_key(msg, PMTCONSTSTR__FREQ)) {
-        pmt::pmt_t x = pmt::dict_ref(msg, PMTCONSTSTR__FREQ, pmt::PMT_NIL);
+    if (pmt::is_dict(msg) && pmt::dict_has_key(msg, PMTCONSTSTR__freq())) {
+        pmt::pmt_t x = pmt::dict_ref(msg, PMTCONSTSTR__freq(), pmt::PMT_NIL);
         if (pmt::is_real(x)) {
             double freq = pmt::to_double(x);
             set_center_freq_(freq);
@@ -273,7 +273,7 @@ int timed_freq_xlating_fir_impl<I, O, T>::work(int noutput_items,
         // Tell downstream items where the frequency change was applied
         this->add_item_tag(0,
                            this->nitems_written(0),
-                           PMTCONSTSTR__FREQ,
+                           PMTCONSTSTR__freq(),
                            pmt::from_double(d_center_freq),
                            this->alias_pmt());
         return 0; // history requirements may have changed.
@@ -293,7 +293,7 @@ int timed_freq_xlating_fir_impl<I, O, T>::work(int noutput_items,
         if ((pmt::eq(tags[0].key, d_tag_pmt)) and (new_freq != d_center_freq)) {
             // and inform the block to retune the next time it is run
             handle_set_center_freq(
-                pmt::cons(PMTCONSTSTR__FREQ, pmt::from_double(new_freq)));
+                pmt::cons(PMTCONSTSTR__freq(), pmt::from_double(new_freq)));
             GR_LOG_INFO(
                 this->d_logger,
                 boost::format("Synchronously setting freq xlator to %f at sample %d") %

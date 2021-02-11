@@ -10,7 +10,7 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import timing_utils_swig as timing_utils
+import timing_utils
 import sandia_utils
 import pdu_utils
 import pmt

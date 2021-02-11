@@ -24,22 +24,16 @@ class system_time_diff_impl : public system_time_diff<T>
 private:
     boost::posix_time::ptime d_epoch;
     bool d_update_time;
-    bool d_output_data;
     bool d_output_diff;
-
-    // output difference port depends on if data is being output as well
-    int d_diff_port;
 
 public:
     /**
      * Constructor
      *
-     * \param output_data Flag to pass data through block
      * \param update_time Flag to update the time tag to the current system time
-     * \param output_diff Output the time difference as a float stream (note,
-     *        this feature is not currently enabled)
+     * \param output_diff Output the time difference to stdout
      */
-    system_time_diff_impl(bool output_data, bool update_time, bool output_diff);
+    system_time_diff_impl(bool update_time, bool output_diff);
     ~system_time_diff_impl();
 
     // Where all the action really happens

@@ -13,6 +13,7 @@ from gnuradio import gr
 from gnuradio import uhd
 import time
 import pmt
+import timing_utils
 
 class usrp_gps_time_sync(gr.sync_block):
     """
@@ -50,8 +51,8 @@ class usrp_gps_time_sync(gr.sync_block):
       self.usrp_source = usrp_source
       self.usrp_source_object = None
 
-      self.message_port_register_in(pmt.intern("in"))
-      self.set_msg_handler(pmt.intern("in"),self.msg_handler)
+      self.message_port_register_in( timing_utils.PMTCONSTSTR__in() )
+      self.set_msg_handler( timing_utils.PMTCONSTSTR__in() ,self.msg_handler)
 
       # current gps status
       self.has_gpsdo = False

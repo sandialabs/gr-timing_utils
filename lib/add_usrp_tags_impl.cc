@@ -46,9 +46,9 @@ add_usrp_tags_impl<T>::add_usrp_tags_impl(double freq,
     tag_now(0);
     d_tagged_sample = 0;
     d_pmt_dict = pmt::make_dict();
-    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSRT__RX_RATE, d_rate_pmt);
-    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSRT__RX_FREQ, d_freq_pmt);
-    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__RX_TIME, d_time_pmt);
+    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_rate(), d_rate_pmt);
+    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_freq(), d_freq_pmt);
+    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_time(), d_time_pmt);
 }
 
 /*
@@ -67,19 +67,19 @@ void add_usrp_tags_impl<T>::update_tags(pmt::pmt_t update)
         return;
     }
 
-    pmt::pmt_t value = pmt::dict_ref(update, PMTCONSTSRT__RX_FREQ, pmt::PMT_NIL);
+    pmt::pmt_t value = pmt::dict_ref(update, PMTCONSTSTR__rx_freq(), pmt::PMT_NIL);
     if (value != pmt::PMT_NIL)
         d_freq_pmt = value;
-    value = pmt::dict_ref(update, PMTCONSTSRT__RX_RATE, pmt::PMT_NIL);
+    value = pmt::dict_ref(update, PMTCONSTSTR__rx_rate(), pmt::PMT_NIL);
     if (value != pmt::PMT_NIL)
         d_rate_pmt = value;
-    value = pmt::dict_ref(update, PMTCONSTSTR__RX_TIME, pmt::PMT_NIL);
+    value = pmt::dict_ref(update, PMTCONSTSTR__rx_time(), pmt::PMT_NIL);
     if (value != pmt::PMT_NIL)
         d_time_pmt = value;
     d_tag_now = true;
-    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSRT__RX_RATE, d_rate_pmt);
-    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSRT__RX_FREQ, d_freq_pmt);
-    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__RX_TIME, d_time_pmt);
+    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_rate(), d_rate_pmt);
+    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_freq(), d_freq_pmt);
+    d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_time(), d_time_pmt);
     GR_LOG_DEBUG(this->d_logger, "Updating tags");
 }
 
@@ -87,7 +87,7 @@ template <class T>
 pmt::pmt_t add_usrp_tags_impl<T>::last_tag()
 {
     pmt::pmt_t retDict = pmt::dict_add(
-        d_pmt_dict, PMTCONSTSRT__RX_SAMPLE, pmt::from_uint64(d_tagged_sample));
+        d_pmt_dict, PMTCONSTSTR__rx_sample(), pmt::from_uint64(d_tagged_sample));
     return retDict;
 }
 
@@ -105,9 +105,9 @@ int add_usrp_tags_impl<T>::work(int noutput_items,
 
     // add tags on the first sample in the output buffer if indicated
     if (d_tag_now) {
-        this->add_item_tag(0, this->nitems_read(0), PMTCONSTSRT__RX_FREQ, d_freq_pmt);
-        this->add_item_tag(0, this->nitems_read(0), PMTCONSTSRT__RX_RATE, d_rate_pmt);
-        this->add_item_tag(0, this->nitems_read(0), PMTCONSTSTR__RX_TIME, d_time_pmt);
+        this->add_item_tag(0, this->nitems_read(0), PMTCONSTSTR__rx_freq(), d_freq_pmt);
+        this->add_item_tag(0, this->nitems_read(0), PMTCONSTSTR__rx_rate(), d_rate_pmt);
+        this->add_item_tag(0, this->nitems_read(0), PMTCONSTSTR__rx_time(), d_time_pmt);
         d_tagged_sample = this->nitems_read(0);
         d_tag_now = false;
     }

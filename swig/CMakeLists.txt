@@ -37,6 +37,14 @@ set(GR_SWIG_DOC_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 GR_SWIG_MAKE(timing_utils_swig timing_utils_swig.i)
 
+# copy python and shared object file to module directory
+add_custom_command(TARGET timing_utils_swig POST_BUILD #  "${CMAKE_CURRENT_BINARY_DIR/python/timing_utils/timing_utils_swig.py}"
+                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/timing_utils_swig.py ${CMAKE_BINARY_DIR}/python/timing_utils/
+                   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/_timing_utils_swig.so ${CMAKE_BINARY_DIR}/python/timing_utils/
+                   COMMENT "Copying swig files to python module directory "
+                   )
+
+
 ########################################################################
 # Install the build swig module
 ########################################################################

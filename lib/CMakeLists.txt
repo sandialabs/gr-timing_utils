@@ -28,6 +28,7 @@ list(APPEND timing_utils_sources
     wall_clock_time_impl.cc
     time_delta_impl.cc
     timed_tag_retuner_impl.cc
+    constants.cc
 )
 
 set(timing_utils_sources "${timing_utils_sources}" PARENT_SCOPE)

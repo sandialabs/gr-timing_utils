@@ -18,24 +18,21 @@ namespace gr {
 namespace timing_utils {
 
 template <class T>
-typename system_time_diff<T>::sptr
-system_time_diff<T>::make(bool output_data, bool update_time, bool output_diff)
+typename system_time_diff<T>::sptr system_time_diff<T>::make(bool update_time,
+                                                             bool output_diff)
 {
     return gnuradio::get_initial_sptr(
-        new system_time_diff_impl<T>(output_data, update_time, output_diff));
+        new system_time_diff_impl<T>(update_time, output_diff));
 }
 
 /*
  * The private constructor
  */
 template <class T>
-system_time_diff_impl<T>::system_time_diff_impl(bool output_data,
-                                                bool update_time,
-                                                bool output_diff)
+system_time_diff_impl<T>::system_time_diff_impl(bool update_time, bool output_diff)
     : gr::block("system_time_diff",
                 gr::io_signature::make(1, 1, sizeof(T)),
                 gr::io_signature::makev(1, 2, std::vector<int>(4, sizeof(T)))),
-      d_output_data(output_data),
       d_update_time(update_time),
       d_output_diff(output_diff)
 
@@ -44,32 +41,18 @@ system_time_diff_impl<T>::system_time_diff_impl(bool output_data,
     // an anonymous std::vector<int>() rvalue, with a const expression
     // initializing the vector, to work.  Lvalues seem to make everything
     // better.
-    if (d_output_data or d_output_diff) {
-        int output_io_sizes[2] = { sizeof(T), sizeof(float) };
-        std::vector<int> output_io_sizes_vector(&output_io_sizes[0], &output_io_sizes[2]);
-        this->set_output_signature(io_signature::makev(1, 2, output_io_sizes_vector));
-    } else {
-        this->set_output_signature(io_signature::make(0, 0, 0));
-    }
-
-    // time tag update only supported if data is being output
-    d_update_time &= d_output_data;
+    int output_io_sizes[2] = { sizeof(T), sizeof(float) };
+    std::vector<int> output_io_sizes_vector(&output_io_sizes[0], &output_io_sizes[2]);
+    this->set_output_signature(io_signature::makev(1, 2, output_io_sizes_vector));
 
     // get posix time
     boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
     d_epoch = epoch;
 
-    // set port to output data to
-
-    d_diff_port = d_output_data ? 1 : 0;
-
-    if (d_update_time) {
-        // don't propagate tags - all tags will be propagated
-        // directly in work function if necessary
-        this->set_tag_propagation_policy(gr::block::TPP_DONT);
-    } else {
-        this->set_tag_propagation_policy(gr::block::TPP_ALL_TO_ALL);
-    }
+    // don't propagate tags - all tags will be propagated
+    // directly in work function since we can not propagate
+    // tags on only a single stream
+    this->set_tag_propagation_policy(gr::block::TPP_DONT);
 }
 
 /*
@@ -95,13 +78,8 @@ int system_time_diff_impl<T>::general_work(int noutput_items,
     const T* in = (const T*)input_items[0];
 
     // get output data only if necessary
-    T* out = NULL;
-    float* diff_out = NULL;
-    if (d_output_data or d_output_diff) {
-        out = (T*)output_items[0];
-        diff_out = (float*)output_items[1];
-    }
-
+    T* out = (T*)output_items[0];
+    float* diff_out = (float*)output_items[1];
 
     // check to see if there are any tags
     std::vector<tag_t> tags;
@@ -115,40 +93,38 @@ int system_time_diff_impl<T>::general_work(int noutput_items,
         // process all tags
         int ntime_tags = 0;
         for (int ii = 0; ii < tags.size(); ii++) {
-            if (pmt::eq(PMTCONSTSTR__WALL_CLOCK_TIME, tags[ii].key)) {
+            if (pmt::eq(PMTCONSTSTR__wall_clock_time(), tags[ii].key)) {
                 double diff = t_now - pmt::to_double(tags[ii].value);
-                std::cout << boost::format("diff = %0.9f s") % diff << std::endl;
+                if (d_output_diff) {
+                    std::cout << boost::format("diff = %0.9f s") % diff << std::endl;
+                }
 
                 // update tag if requested
                 if (d_update_time) {
                     this->add_item_tag(0,
                                        tags[ii].offset,
-                                       PMTCONSTSTR__WALL_CLOCK_TIME,
+                                       PMTCONSTSTR__wall_clock_time(),
                                        pmt::from_double(t_now));
-                }
-
-                // output time
-                if (d_output_diff) {
-                    diff_out[ntime_tags++] = (float)diff;
-                }
-            } else {
-                // add tag back if updating time
-                if (d_update_time) {
+                } else {
                     this->add_item_tag(0, tags[ii].offset, tags[ii].key, tags[ii].value);
                 }
+
+
+                // output time
+                diff_out[ntime_tags++] = (float)diff;
+            } else {
+                // add tag back
+                this->add_item_tag(0, tags[ii].offset, tags[ii].key, tags[ii].value);
             }
         }
+
         // update number of items produced
         this->produce(1, ntime_tags);
     } /* end if tags.size() */
 
-    // then copy all of the items to the output
-    if (d_output_data) {
-        memcpy((void*)out, (void*)in, sizeof(T) * nitems);
-        //         std::cout << "calling produce for channel 0: " << noutput_items <<
-        //         std::endl;
-        this->produce(0, nitems);
-    }
+    // copy all of the items to the output
+    memcpy((void*)out, (void*)in, sizeof(T) * nitems);
+    this->produce(0, nitems);
 
     // tell the scheduler how many items were consumed
     this->consume(0, nitems);

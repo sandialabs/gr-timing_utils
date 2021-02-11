@@ -11,6 +11,7 @@
 import numpy
 import pmt
 from gnuradio import gr
+import timing_utils
 
 RISING_EDGE = 0
 FALLING_EDGE = 1
@@ -26,8 +27,8 @@ class edge_distance(gr.sync_block):
             in_sig=[numpy.float32],
             out_sig=None)
 
-        self.st = pmt.intern("START")
-        self.et = pmt.intern("END")
+        self.st = timing_utils.PMTCONSTSTR__START()
+        self.et = timing_utils.PMTCONSTSTR__END()
         self.rate = samp_rate
         self.start_idx = 0
 

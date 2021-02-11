@@ -38,10 +38,10 @@ uhd_timed_pdu_emitter_impl::uhd_timed_pdu_emitter_impl(float rate, bool drop_lat
     // start time is zero
     d_start_time = to_tpmt(0, 0.0);
 
-    message_port_register_out(PMTCONSTSTR__TIME);
-    message_port_register_in(PMTCONSTSTR__SET);
+    message_port_register_out(PMTCONSTSTR__time());
+    message_port_register_in(PMTCONSTSTR__set());
 
-    set_msg_handler(PMTCONSTSTR__SET,
+    set_msg_handler(PMTCONSTSTR__set(),
                     boost::bind(&uhd_timed_pdu_emitter_impl::handle_set_time, this, _1));
 }
 
@@ -173,9 +173,9 @@ void uhd_timed_pdu_emitter_impl::handle_set_time(pmt::pmt_t time_pmt)
 
     // build the output PMT dictionary
     d_pmt_out = pmt::make_dict();
-    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__TRIG_TIME, trigger_time);
-    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__TRIG_SAMP, pmt::from_double(d_trigger_samp));
-    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__LATE_DELTA, pmt::from_double(0));
+    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__trigger_time(), trigger_time);
+    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__trigger_sample(), pmt::from_double(d_trigger_samp));
+    d_pmt_out = pmt::dict_add(d_pmt_out, PMTCONSTSTR__late_delta(), pmt::from_double(0));
     d_armed = true;
     // std::cout << "ARMED! FOR TIME " << d_pmt_out << std::endl;
 }
@@ -195,10 +195,10 @@ int uhd_timed_pdu_emitter_impl::work(int noutput_items,
             // check if we are late to trigger
             if (d_trigger_samp < nitems_read(0)) {
                 if (!d_drop_late) {
-                    message_port_pub(PMTCONSTSTR__TRIG, d_pmt_out);
+                    message_port_pub(PMTCONSTSTR__trig(), d_pmt_out);
                 }
             } else {
-                message_port_pub(PMTCONSTSTR__TRIG, d_pmt_out);
+                message_port_pub(PMTCONSTSTR__trig(), d_pmt_out);
             }
             d_armed = false;
         }
@@ -206,7 +206,7 @@ int uhd_timed_pdu_emitter_impl::work(int noutput_items,
 
     // check for uhd rx_time tags to set baseline time and correct for overflows
     get_tags_in_range(
-        tags, 0, nitems_read(0), (nitems_read(0) + noutput_items), PMTCONSTSTR__RX_TIME);
+        tags, 0, nitems_read(0), (nitems_read(0) + noutput_items), PMTCONSTSTR__rx_time());
     if (tags.size()) {
         for (int ii = 0; ii < tags.size(); ii++) {
             pmt::pmt_t tpmt = pmt::cons(pmt::tuple_ref(tags[ii].value, 0),

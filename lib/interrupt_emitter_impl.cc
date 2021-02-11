@@ -38,11 +38,11 @@ interrupt_emitter_impl<T>::interrupt_emitter_impl(double rate, bool drop_late)
       d_rate(rate),
       d_drop_late(drop_late)
 {
-    this->message_port_register_out(PMTCONSTSTR__TRIG);
-    this->message_port_register_in(PMTCONSTSTR__SET);
+    this->message_port_register_out(PMTCONSTSTR__trig());
+    this->message_port_register_in(PMTCONSTSTR__set());
 
     this->set_msg_handler(
-        PMTCONSTSTR__SET,
+        PMTCONSTSTR__set(),
         boost::bind(&interrupt_emitter_impl<T>::handle_set_time, this, _1));
 
     boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
@@ -135,10 +135,10 @@ void interrupt_emitter_impl<T>::handle_set_time(pmt::pmt_t time_pmt)
         return;
 
     pmt::pmt_t pmt_out = pmt::make_dict();
-    pmt_out = pmt::dict_add(pmt_out, PMTCONSTSTR__TRIG_TIME, trigger_time);
+    pmt_out = pmt::dict_add(pmt_out, PMTCONSTSTR__trigger_time(), trigger_time);
     pmt_out = pmt::dict_add(
-        pmt_out, PMTCONSTSTR__TRIG_SAMP, pmt::from_uint64(trigger_sample));
-    pmt_out = pmt::dict_add(pmt_out, PMTCONSTSTR__LATE_DELTA, pmt::from_double(0));
+        pmt_out, PMTCONSTSTR__trigger_sample(), pmt::from_uint64(trigger_sample));
+    pmt_out = pmt::dict_add(pmt_out, PMTCONSTSTR__late_delta(), pmt::from_double(0));
 
     double current_time((boost::get_system_time() - epoch).total_microseconds() /
                             1000000.0 -
@@ -158,7 +158,7 @@ void interrupt_emitter_impl<T>::handle_set_time(pmt::pmt_t time_pmt)
             // interrupt system bad things can happen if we go off of the sample time
             // rather than clock time.
             pmt_out = pmt::dict_add(
-                pmt_out, PMTCONSTSTR__LATE_DELTA, pmt::from_double((wait_time * -1.0)));
+                pmt_out, PMTCONSTSTR__late_delta(), pmt::from_double((wait_time * -1.0)));
             io.dispatch(
                 boost::bind(&interrupt_emitter_impl<T>::StartTimer, this, 0, pmt_out));
         }
@@ -182,12 +182,12 @@ bool interrupt_emitter_impl<T>::stop()
 template <class T>
 void interrupt_emitter_impl<T>::process_interrupt()
 {
-    pmt::pmt_t time_pmt = pmt::dict_ref(d_out_pmt, PMTCONSTSTR__TRIG_TIME, pmt::PMT_NIL);
+    pmt::pmt_t time_pmt = pmt::dict_ref(d_out_pmt, PMTCONSTSTR__trigger_time(), pmt::PMT_NIL);
     double int_time =
         pmt::to_uint64(pmt::car(time_pmt)) + pmt::to_double(pmt::cdr(time_pmt));
     d_out_pmt = pmt::dict_add(
-        d_out_pmt, PMTCONSTSTR__TRIG_SAMP, pmt::from_uint64(time_to_samples(int_time)));
-    this->message_port_pub(pmt::mp("trig"), d_out_pmt);
+        d_out_pmt, PMTCONSTSTR__trigger_sample(), pmt::from_uint64(time_to_samples(int_time)));
+    this->message_port_pub(PMTCONSTSTR__trig(), d_out_pmt);
 }
 
 template <class T>
@@ -213,7 +213,7 @@ int interrupt_emitter_impl<T>::work(int noutput_items,
                             0,
                             this->nitems_read(0),
                             (this->nitems_read(0) + noutput_items),
-                            PMTCONSTSTR__RX_TIME);
+                            PMTCONSTSTR__rx_time());
     if (tags.size()) {
         // Only need to look at the last one
         tag_t last_tag = tags[tags.size() - 1];

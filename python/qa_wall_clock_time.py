@@ -10,10 +10,11 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import timing_utils_swig as timing_utils
+import timing_utils
 import pdu_utils
 import time
 import pmt
+
 
 class qa_wall_clock_time(gr_unittest.TestCase):
 
@@ -25,8 +26,8 @@ class qa_wall_clock_time(gr_unittest.TestCase):
         self.debug = blocks.message_debug()
 
         # make connections
-        self.tb.msg_connect((self.emitter,'msg'),(self.wall_clock_time,'pdu_in'))
-        self.tb.msg_connect((self.wall_clock_time,'pdu_out'),(self.debug,'store'))
+        self.tb.msg_connect((self.emitter, 'msg'), (self.wall_clock_time, 'pdu_in'))
+        self.tb.msg_connect((self.wall_clock_time, 'pdu_out'), (self.debug, 'store'))
 
     def tearDown(self):
         self.tb = None
@@ -35,20 +36,20 @@ class qa_wall_clock_time(gr_unittest.TestCase):
         self.tb.start()
         self.emitter.emit(pmt.intern("BAD PDU"))
         time.sleep(.01)
-        self.emitter.emit(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[0])))
+        self.emitter.emit(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1, [0])))
         time.sleep(1.0)
-        self.emitter.emit(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[0])))
+        self.emitter.emit(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1, [0])))
         time.sleep(.05)
         self.tb.stop()
         self.tb.wait()
 
         t0 = pmt.to_double(pmt.dict_ref(pmt.car(self.debug.get_message(0)),
-                           pmt.intern("wall_clock_time"),
-                           pmt.from_double(0.0)))
+                                        pmt.intern("wall_clock_time"),
+                                        pmt.from_double(0.0)))
         t1 = pmt.to_double(pmt.dict_ref(pmt.car(self.debug.get_message(1)),
-                           pmt.intern("wall_clock_time"),
-                           pmt.from_double(0.0)))
-        self.assertTrue(((t1-t0)-1) < 0.05)
+                                        pmt.intern("wall_clock_time"),
+                                        pmt.from_double(0.0)))
+        self.assertTrue(((t1 - t0) - 1) < 0.05)
 
     def test_basic_io(self):
         self.tb.start()
@@ -56,13 +57,12 @@ class qa_wall_clock_time(gr_unittest.TestCase):
         time.sleep(.01)
         self.emitter.emit(pmt.cons(pmt.from_long(4), pmt.PMT_NIL))
         time.sleep(.01)
-        self.emitter.emit(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1,[0])))
+        self.emitter.emit(pmt.cons(pmt.make_dict(), pmt.init_u8vector(1, [0])))
         time.sleep(.05)
         self.tb.stop()
         self.tb.wait()
 
         self.assertTrue(True)
-
 
 
 if __name__ == '__main__':

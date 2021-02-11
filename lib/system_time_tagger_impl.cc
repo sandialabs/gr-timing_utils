@@ -71,7 +71,7 @@ int system_time_tagger_impl<T>::work(int noutput_items,
                              1000000.0);
                 this->add_item_tag(0,
                                    d_next_tag_offset,
-                                   PMTCONSTSTR__WALL_CLOCK_TIME,
+                                   PMTCONSTSTR__wall_clock_time(),
                                    pmt::from_double(t_now));
 
                 // set next offset

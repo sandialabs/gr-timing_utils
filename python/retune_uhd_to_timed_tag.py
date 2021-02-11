@@ -13,6 +13,7 @@ import pmt
 import threading
 from gnuradio import gr
 from collections import deque
+import timing_utils
 
 NO_TAG_PENDING = -1
 TAG_IMMEDIATELY = -2
@@ -59,15 +60,15 @@ class retune_uhd_to_timed_tag(gr.sync_block):
 
     # this is exposed as a member variable, but really should not be
     # modified as the downstream block respects this key
-    self.set_tag_key(pmt.intern("set_freq"))
+    self.set_tag_key( timing_utils.PMTCONSTSTR__set_freq() )
     self.set_dict_key(dict_key)
 
     # time reference key
-    self.time_key = pmt.intern("rx_time")
+    self.time_key = timing_utils.PMTCONSTSTR__rx_time()
 
-    self.message_port_register_in(pmt.intern("command"))
-    self.set_msg_handler(pmt.intern("command"), self.handle_command)
-    self.message_port_register_out(pmt.intern("freq"))
+    self.message_port_register_in( timing_utils.PMTCONSTSTR__command() )
+    self.set_msg_handler( timing_utils.PMTCONSTSTR__command(), self.handle_command)
+    self.message_port_register_out( timing_utils.PMTCONSTSTR__freq() )
 
     # queue for tune commands
     self.tune_commands = deque((),maxlen=64)
@@ -112,12 +113,12 @@ class retune_uhd_to_timed_tag(gr.sync_block):
         if not pmt.eqv(lo_offset, pmt.PMT_NIL):
           offset = pmt.to_python(lo_offset)
           # print "lo offset is " + repr(offset*-1.0)
-          self.message_port_pub(pmt.intern("freq"),
-              pmt.cons(pmt.intern("freq"), pmt.from_double(-1.0*offset)))
+          self.message_port_pub( timing_utils.PMTCONSTSTR__freq(),
+              pmt.cons( timing_utils.PMTCONSTSTR__freq(), pmt.from_double(-1.0*offset)))
           # print "published msg, offset = " + repr(-1.0*offset)
 
           # if the dictionary has a time value, use it
-          time_tag = pmt.dict_ref(msg, pmt.intern("time"), pmt.PMT_NIL)
+          time_tag = pmt.dict_ref(msg, timing_utils.PMTCONSTSTR__time(), pmt.PMT_NIL)
           if not pmt.eqv(time_tag, pmt.PMT_NIL):
             secs = pmt.to_uint64(pmt.car(time_tag)) - self.ref_time['secs']
             frac = pmt.to_double(pmt.cdr(time_tag)) - self.ref_time['frac']

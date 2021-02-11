@@ -37,10 +37,10 @@ time_delta_impl::time_delta_impl(const pmt::pmt_t delta_key, const pmt::pmt_t ti
     boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
     d_epoch = epoch;
 
-    message_port_register_in(PMTCONSTSTR__PDU_IN);
-    set_msg_handler(PMTCONSTSTR__PDU_IN,
+    message_port_register_in(PMTCONSTSTR__pdu_in());
+    set_msg_handler(PMTCONSTSTR__pdu_in(),
                     boost::bind(&time_delta_impl::handle_pdu, this, _1));
-    message_port_register_out(PMTCONSTSTR__PDU_OUT);
+    message_port_register_out(PMTCONSTSTR__pdu_out());
 }
 
 /*
@@ -94,7 +94,7 @@ void time_delta_impl::handle_pdu(pmt::pmt_t pdu)
     // time_delta);
 
     meta = pmt::dict_add(meta, d_delta_key, pmt::from_double(time_delta));
-    message_port_pub(PMTCONSTSTR__PDU_OUT, (pmt::cons(meta, pmt::cdr(pdu))));
+    message_port_pub(PMTCONSTSTR__pdu_out(), (pmt::cons(meta, pmt::cdr(pdu))));
 
     // update estimates
     d_sum_x += time_delta;

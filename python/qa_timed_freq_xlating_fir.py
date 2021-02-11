@@ -10,35 +10,37 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import timing_utils_swig as timing_utils
+import timing_utils
 import time
+
 
 class qa_timed_freq_xlating_fir (gr_unittest.TestCase):
 
-    def setUp (self):
-        self.tb = gr.top_block ()
+    def setUp(self):
+        self.tb = gr.top_block()
 
-    def tearDown (self):
+    def tearDown(self):
         self.tb = None
 
     def test_001_instantiate(self):
-        self.tb = gr.top_block ()
+        self.tb = gr.top_block()
         self.rate = 250000
         self.interval = 173
         self.duration = 9000
 
         self.src = blocks.vector_source_c(list(range(self.duration)), False, 1, [])
-        self.dut = timing_utils.timed_freq_xlating_fir_ccc( 1, [1], 915e6, self.rate )
-        self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex*1, '', "");
-        
-        self.tb.connect((self.src,0),(self.dut,0))
+        self.dut = timing_utils.timed_freq_xlating_fir_ccc(1, [1], 915e6, self.rate)
+        self.tag_dbg = blocks.tag_debug(gr.sizeof_gr_complex * 1, '', "")
+
+        self.tb.connect((self.src, 0), (self.dut, 0))
         self.tb.connect((self.dut, 0), (self.tag_dbg, 0))
 
         # set up fg
-        self.tb.run ()
+        self.tb.run()
         time.sleep(0.05)
 
         # check data
+
 
 if __name__ == '__main__':
     gr_unittest.run(qa_timed_freq_xlating_fir)

@@ -46,16 +46,16 @@ timed_tag_retuner_impl::timed_tag_retuner_impl(double sample_rate,
 
     // downstream timed frequency translating fir filter block
     // uses this tag to change frequencies
-    d_tag_key = PMTCONSTSTR__SET_FREQ;
+    d_tag_key = PMTCONSTSTR__set_freq();
 
     // time reference key
-    d_time_key = PMTCONSTSTR__RX_TIME;
+    d_time_key = PMTCONSTSTR__rx_time();
 
     // register message ports
-    this->message_port_register_out(PMTCONSTSTR__FREQ);
-    this->message_port_register_in(PMTCONSTSTR__COMMAND);
+    this->message_port_register_out(PMTCONSTSTR__freq());
+    this->message_port_register_in(PMTCONSTSTR__command());
     this->set_msg_handler(
-        PMTCONSTSTR__COMMAND,
+        PMTCONSTSTR__command(),
         boost::bind(&timed_tag_retuner_impl::command_handler, this, _1));
 }
 
@@ -90,13 +90,13 @@ void timed_tag_retuner_impl::command_handler(pmt::pmt_t msg)
         }
 
         this->message_port_pub(
-            PMTCONSTSTR__FREQ,
-            pmt::cons(PMTCONSTSTR__FREQ, pmt::from_double(-1. * offset)));
+            PMTCONSTSTR__freq(),
+            pmt::cons(PMTCONSTSTR__freq(), pmt::from_double(-1. * offset)));
 
         bool tag_now = true;
         uint64_t tag_offset = 0;
         try {
-            pmt::pmt_t time_tag = pmt::dict_ref(msg, PMTCONSTSTR__TIME, pmt::PMT_NIL);
+            pmt::pmt_t time_tag = pmt::dict_ref(msg, PMTCONSTSTR__time(), pmt::PMT_NIL);
             if (!pmt::equal(time_tag, pmt::PMT_NIL)) {
                 uint64_t secs = pmt::to_uint64(pmt::car(time_tag)) - d_ref_time.secs;
                 double frac = pmt::to_double(pmt::cdr(time_tag)) - d_ref_time.frac;
