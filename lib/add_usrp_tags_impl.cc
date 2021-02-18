@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -22,8 +22,8 @@ template <class T>
 typename add_usrp_tags<T>::sptr
 add_usrp_tags<T>::make(double freq, double rate, uint64_t epoch_int, double epoch_frac)
 {
-    return gnuradio::get_initial_sptr(
-        new add_usrp_tags_impl<T>(freq, rate, epoch_int, epoch_frac));
+    return gnuradio::make_block_sptr<add_usrp_tags_impl<T>>(
+        freq, rate, epoch_int, epoch_frac);
 }
 
 /*

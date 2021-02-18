@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -60,23 +60,23 @@ public:
                                 double center_freq,
                                 double sampling_freq,
                                 std::string tag_key);
-    ~timed_freq_xlating_fir_impl();
+    ~timed_freq_xlating_fir_impl() override;
 
-    void set_decim(int decimation);
-    int decim() const;
+    void set_decim(int decimation) override;
+    int decim() const override;
 
-    void set_rate(double rate);
-    double rate() const;
+    void set_rate(double rate) override;
+    double rate() const override;
 
-    void set_center_freq(double center_freq);
-    double center_freq() const;
+    void set_center_freq(double center_freq) override;
+    double center_freq() const override;
 
-    void set_taps(const std::vector<T>& taps);
-    std::vector<T> taps() const;
+    void set_taps(const std::vector<T>& taps) override;
+    std::vector<T> taps() const override;
 
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } // namespace timing_utils

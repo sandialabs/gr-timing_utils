@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -19,7 +19,7 @@ namespace timing_utils {
 
 wall_clock_time::sptr wall_clock_time::make(const pmt::pmt_t key)
 {
-    return gnuradio::get_initial_sptr(new wall_clock_time_impl(key));
+    return gnuradio::make_block_sptr<wall_clock_time_impl>(key);
 }
 
 /*
@@ -36,7 +36,7 @@ wall_clock_time_impl::wall_clock_time_impl(const pmt::pmt_t key)
 
     message_port_register_in(PMTCONSTSTR__pdu_in());
     set_msg_handler(PMTCONSTSTR__pdu_in(),
-                    boost::bind(&wall_clock_time_impl::handle_pdu, this, _1));
+                    [this](pmt::pmt_t msg) { this->handle_pdu(msg); });
     message_port_register_out(PMTCONSTSTR__pdu_out());
 }
 

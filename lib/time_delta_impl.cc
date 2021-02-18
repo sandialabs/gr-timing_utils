@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -19,7 +19,7 @@ namespace timing_utils {
 
 time_delta::sptr time_delta::make(const pmt::pmt_t delta_key, const pmt::pmt_t time_key)
 {
-    return gnuradio::get_initial_sptr(new time_delta_impl(delta_key, time_key));
+    return gnuradio::make_block_sptr<time_delta_impl>(delta_key, time_key);
 }
 
 /*
@@ -39,7 +39,7 @@ time_delta_impl::time_delta_impl(const pmt::pmt_t delta_key, const pmt::pmt_t ti
 
     message_port_register_in(PMTCONSTSTR__pdu_in());
     set_msg_handler(PMTCONSTSTR__pdu_in(),
-                    boost::bind(&time_delta_impl::handle_pdu, this, _1));
+                    [this](pmt::pmt_t msg) { this->handle_pdu(msg); });
     message_port_register_out(PMTCONSTSTR__pdu_out());
 }
 

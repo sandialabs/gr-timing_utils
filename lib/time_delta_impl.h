@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -28,18 +28,13 @@ private:
     double d_sum_x, d_sum_x2;
     int d_n;
 
-public:
-    /**
-     * Constructor
-     *
-     */
-    time_delta_impl(const pmt::pmt_t delta_key, const pmt::pmt_t time_key);
-    ~time_delta_impl();
-
-    // overloaded functions
-    bool stop();
-
     void handle_pdu(pmt::pmt_t pdu);
+
+public:
+    time_delta_impl(const pmt::pmt_t delta_key, const pmt::pmt_t time_key);
+    ~time_delta_impl() override;
+
+    bool stop() override;
 };
 
 } // namespace timing_utils

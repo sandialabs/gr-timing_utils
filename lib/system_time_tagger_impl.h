@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -29,25 +29,14 @@ private:
     uint64_t d_total_nitems_read;
 
 public:
-    /*!
-     * \brief Return a shared_ptr to a new instance of timing_utils::system_time_tagger.
-     *
-     * @param tag_interval - number of samples between tags
-     */
     system_time_tagger_impl(uint32_t tag_interval);
-    ~system_time_tagger_impl();
+    ~system_time_tagger_impl() override;
 
-    // Where all the action really happens
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 
-    /**
-     * Sets interval between tags
-     *
-     * @param tag_interval
-     */
-    void set_interval(uint32_t tag_interval);
+    void set_interval(uint32_t tag_interval) override;
 };
 
 } // namespace timing_utils

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -24,8 +24,8 @@ timed_tag_retuner::sptr timed_tag_retuner::make(double sample_rate,
                                                 uint64_t origin_t_secs,
                                                 double origin_t_frac)
 {
-    return gnuradio::get_initial_sptr(
-        new timed_tag_retuner_impl(sample_rate, dict_key, origin_t_secs, origin_t_frac));
+    return gnuradio::make_block_sptr<timed_tag_retuner_impl>(
+        sample_rate, dict_key, origin_t_secs, origin_t_frac);
 }
 
 
@@ -54,9 +54,8 @@ timed_tag_retuner_impl::timed_tag_retuner_impl(double sample_rate,
     // register message ports
     this->message_port_register_out(PMTCONSTSTR__freq());
     this->message_port_register_in(PMTCONSTSTR__command());
-    this->set_msg_handler(
-        PMTCONSTSTR__command(),
-        boost::bind(&timed_tag_retuner_impl::command_handler, this, _1));
+    set_msg_handler(PMTCONSTSTR__command(),
+                    [this](pmt::pmt_t msg) { this->command_handler(msg); });
 }
 
 /*

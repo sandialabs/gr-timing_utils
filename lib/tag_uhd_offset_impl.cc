@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -21,7 +21,7 @@ template <class T>
 typename tag_uhd_offset<T>::sptr tag_uhd_offset<T>::make(float rate,
                                                          uint32_t tag_interval)
 {
-    return gnuradio::get_initial_sptr(new tag_uhd_offset_impl<T>(rate, tag_interval));
+    return gnuradio::make_block_sptr<tag_uhd_offset_impl<T>>(rate, tag_interval);
 }
 
 /*

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -36,29 +36,18 @@ private:
     pmt::pmt_t samples_to_tpmt(uint64_t);
     uint64_t tpmt_to_samples(pmt::pmt_t);
 
-public:
-    /**
-     * Constructor
-     *
-     * @param rate -
-     * @param drop_late -
-     */
-    uhd_timed_pdu_emitter_impl(float rate, bool drop_late);
-    ~uhd_timed_pdu_emitter_impl();
-
     // input message handler
     void handle_set_time(pmt::pmt_t);
 
-    /**
-     *
-     * @param rate -
-     */
-    void set_rate(float rate) { d_rate = rate; }
+public:
+    uhd_timed_pdu_emitter_impl(float rate, bool drop_late);
+    ~uhd_timed_pdu_emitter_impl() override;
 
-    // Where all the action really happens
+    void set_rate(float rate) override { d_rate = rate; }
+
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } // namespace timing_utils

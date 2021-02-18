@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -49,7 +49,7 @@ template <class I, class O, class T>
 class TIMING_UTILS_API timed_freq_xlating_fir : virtual public sync_decimator
 {
 public:
-    typedef boost::shared_ptr<timed_freq_xlating_fir<I, O, T>> sptr;
+    typedef std::shared_ptr<timed_freq_xlating_fir<I, O, T>> sptr;
 
     /*!
      * \brief FIR filter with gr_complex input, gr_complex output, and

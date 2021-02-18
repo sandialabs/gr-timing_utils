@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -20,7 +20,7 @@ namespace timing_utils {
 template <class T>
 typename system_time_tagger<T>::sptr system_time_tagger<T>::make(uint32_t tag_interval)
 {
-    return gnuradio::get_initial_sptr(new system_time_tagger_impl<T>(tag_interval));
+    return gnuradio::make_block_sptr<system_time_tagger_impl<T>>(tag_interval);
 }
 
 /*

@@ -48,13 +48,6 @@ class retune_uhd_to_timed_tag(gr.sync_block):
         in_sig=[numpy.complex64],
         out_sig=[numpy.complex64])
 
-    # setup logger
-    logger_name = 'gr_log.' + self.to_basic_block().alias()
-    if logger_name in gr.logger_get_names():
-      self.log = gr.logger(logger_name)
-    else:
-      self.log = gr.logger('log')
-
     self.set_sample_rate(sample_rate)
     self.set_ref_time(offset = 0, secs = origin_t_secs, frac = origin_t_frac)
 

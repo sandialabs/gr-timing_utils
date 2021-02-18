@@ -124,7 +124,7 @@ def open_src (name, mode):
 def do_substitution (d, in_file, out_file):
     def repl (match_obj):
         key = match_obj.group (1)
-        # print key
+        # print(key)
         return d[key]
 
     inp = in_file.read ()
@@ -135,7 +135,7 @@ def do_substitution (d, in_file, out_file):
 
 copyright = '''/* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of Sandia, LLC
+ * Copyright 2018-2021 National Technology & Engineering Solutions of Sandia, LLC
  * (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government
  * retains certain rights in this software.
  *
@@ -199,4 +199,5 @@ def standard_impl_dict2 (name, code3, package):
     d['O_TYPE'] = o_type (code3)
     d['TAP_TYPE'] = tap_type (code3)
     d['IS_COMPLEX'] = is_complex (code3)
+    d['PMT_TYPE'] = pmt_type (code3)
     return d

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -27,8 +27,8 @@ timed_freq_xlating_fir<I, O, T>::make(int decimation,
                                       double sampling_freq,
                                       std::string tag_key)
 {
-    return gnuradio::get_initial_sptr(new timed_freq_xlating_fir_impl<I, O, T>(
-        decimation, taps, center_freq, sampling_freq, tag_key));
+    return gnuradio::make_block_sptr<timed_freq_xlating_fir_impl<I, O, T>>(
+        decimation, taps, center_freq, sampling_freq, tag_key);
 }
 
 template <class I, class O, class T>
@@ -51,8 +51,7 @@ timed_freq_xlating_fir_impl<I, O, T>::timed_freq_xlating_fir_impl(
     // fir filter - output is always complex so taps for the fir are always complex
     // even though specified taps can be of a different type
     std::vector<gr_complex> dummy_taps;
-    d_composite_fir =
-        new filter::kernel::fir_filter<I, O, gr_complex>(d_decim, dummy_taps);
+    d_composite_fir = new filter::kernel::fir_filter<I, O, gr_complex>(dummy_taps);
 
     // set taps
     set_taps_(taps);
@@ -66,10 +65,8 @@ timed_freq_xlating_fir_impl<I, O, T>::timed_freq_xlating_fir_impl(
     d_tag_pmt = pmt::string_to_symbol(d_tag_key);
 
     this->message_port_register_in(PMTCONSTSTR__freq());
-    this->set_msg_handler(
-        PMTCONSTSTR__freq(),
-        boost::bind(
-            &timed_freq_xlating_fir_impl<I, O, T>::handle_set_center_freq, this, _1));
+    this->set_msg_handler(PMTCONSTSTR__freq(),
+                          [this](pmt::pmt_t msg) { this->handle_set_center_freq(msg); });
 
     // manually propagate tags
     this->set_tag_propagation_policy(gr::block::TPP_DONT);

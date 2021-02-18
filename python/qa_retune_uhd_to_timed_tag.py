@@ -25,8 +25,8 @@ class qa_retune_uhd_to_timed_tag (gr_unittest.TestCase):
     def test_001_instantiate(self):
 
         # data
-        src_data = (1 + 1j, 2 + 2j, 3 + 3j)
-        expected_result = (1 + 1j, 2 + 2j, 3 + 3j)
+        src_data = [1 + 1j, 2 + 2j, 3 + 3j]
+        expected_result = [1 + 1j, 2 + 2j, 3 + 3j]
 
         # blocks
         src = blocks.vector_source_c(src_data)

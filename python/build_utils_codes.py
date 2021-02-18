@@ -30,6 +30,15 @@ def o_type (code3):
 def tap_type (code3):
     return char_to_type[tap_code (code3)]
 
+def pmt_type (code3):
+    return char_to_pmt[code3[0]]
+
+char_to_pmt = {}
+char_to_pmt['s'] = 's16'
+char_to_pmt['i'] = 's32'
+char_to_pmt['f'] = 'f32'
+char_to_pmt['c'] = 'c32'
+char_to_pmt['b'] = 'u8'
 
 char_to_type = {}
 char_to_type['s'] = 'short'

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -27,27 +27,18 @@ private:
     bool d_tag_now;
 
 public:
-    /*!
-     * Constructor
-     *
-     *
-     * \param freq Center frequency (Hz)
-     * \param rate Sampling rate (Hz)
-     * \param epoch_int Whole seconds of first sample
-     * \param epoch_frac Fractional seconds of first sample
-     */
     add_usrp_tags_impl(double freq, double rate, uint64_t epoch_int, double epoch_frac);
-    ~add_usrp_tags_impl();
+    ~add_usrp_tags_impl() override;
 
     // the dummy argument allows the GRC callback to call this function
-    void tag_now(uint32_t dummy) { d_tag_now = true; }
-    void update_tags(pmt::pmt_t update);
-    pmt::pmt_t last_tag();
+    void tag_now(uint32_t dummy) override { d_tag_now = true; }
+    void update_tags(pmt::pmt_t update) override;
+    pmt::pmt_t last_tag() override;
 
     // Where all the action really happens
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } // namespace timing_utils

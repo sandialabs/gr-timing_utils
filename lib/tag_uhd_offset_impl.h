@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -35,37 +35,16 @@ private:
     void update_time_tag(uint64_t);
 
 public:
-    /**
-     * Constructor
-     *
-     * @param rate
-     * @param tag_interval
-     */
     tag_uhd_offset_impl(float rate, uint32_t tag_interval);
-    ~tag_uhd_offset_impl();
+    ~tag_uhd_offset_impl() override;
 
-    // Where all the action really happens
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 
-    /**
-     *
-     * @param rate -
-     */
-    void set_rate(float rate);
-
-    /**
-     *
-     * @param tag_interval
-     */
-    void set_interval(uint32_t tag_interval);
-
-    /**
-     *
-     * @param tag_key -
-     */
-    void set_key(pmt::pmt_t tag_key);
+    void set_rate(float rate) override;
+    void set_interval(uint32_t tag_interval) override;
+    void set_key(pmt::pmt_t tag_key) override;
 };
 
 } // namespace timing_utils

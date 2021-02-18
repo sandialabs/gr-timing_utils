@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of Sandia, LLC
+# Copyright 2018-2021 National Technology & Engineering Solutions of Sandia, LLC
 # (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government
 # retains certain rights in this software.
 #
@@ -11,11 +11,18 @@
 from builtins import range
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import timing_utils
 import pmt
 import time
 import pdu_utils
 from math import ceil
+try:
+    import timing_utils
+except ImportError:
+    import os
+    import sys
+    dirname, filename = os.path.split(os.path.abspath(__file__))
+    sys.path.append(os.path.join(dirname, "bindings"))
+    import timing_utils
 
 
 class qa_interrupt_emitter (gr_unittest.TestCase):
@@ -90,14 +97,14 @@ class qa_interrupt_emitter (gr_unittest.TestCase):
         for i in range(15):
             if self.msg_dbg.num_messages() == 3:
                 break
-            time.sleep(0.02)
+            time.sleep(0.1)
 
         # DO NOT call wait!!!!  It won't return because the emitter block doesn't have any inputs.
         self.tb.stop()
-        time.sleep(.01)
+        time.sleep(.1)
 
         if (self.msg_dbg.num_messages() != 3):
-            raise Exception("Did not send required messages")
+            raise Exception("Did not send required messages, sent", self.msg_dbg.num_messages(), "should have sent 3")
         self.checkmsgtime(self.msg_dbg.get_message(0), t0, (t0 - self.start_time) * self.rate)
         self.checkmsgtime(self.msg_dbg.get_message(1), t1, (t1 - self.start_time) * self.rate)
         self.checkmsgtime(self.msg_dbg.get_message(2), t2, (t2 - self.start_time) * self.rate)
@@ -117,7 +124,7 @@ class qa_interrupt_emitter (gr_unittest.TestCase):
 
         # DO NOT call wait!!!!  It won't return because the emitter block doesn't have any inputs.
         self.tb.stop()
-        time.sleep(.01)
+        time.sleep(.1)
 
         if (self.msg_dbg.num_messages() != 1):
             raise Exception("Did not send required messages")
@@ -147,7 +154,7 @@ class qa_interrupt_emitter (gr_unittest.TestCase):
 
         # DO NOT call wait!!!!  It won't return because the emitter block doesn't have any inputs.
         self.tb.stop()
-        time.sleep(.01)
+        time.sleep(.1)
 
         tag = self.utag.last_tag()
         sample = pmt.to_uint64(pmt.dict_ref(tag, pmt.intern("rx_sample"), pmt.PMT_NIL))

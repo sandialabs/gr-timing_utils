@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -23,7 +23,7 @@ template <class T>
 typename interrupt_emitter<T>::sptr interrupt_emitter<T>::make(double rate,
                                                                bool drop_late)
 {
-    return gnuradio::get_initial_sptr(new interrupt_emitter_impl<T>(rate, drop_late));
+    return gnuradio::make_block_sptr<interrupt_emitter_impl<T>>(rate, drop_late);
 }
 
 /*
@@ -41,10 +41,8 @@ interrupt_emitter_impl<T>::interrupt_emitter_impl(double rate, bool drop_late)
     this->message_port_register_out(PMTCONSTSTR__trig());
     this->message_port_register_in(PMTCONSTSTR__set());
 
-    this->set_msg_handler(
-        PMTCONSTSTR__set(),
-        boost::bind(&interrupt_emitter_impl<T>::handle_set_time, this, _1));
-
+    this->set_msg_handler(PMTCONSTSTR__set(),
+                          [this](pmt::pmt_t msg) { this->handle_set_time(msg); });
     boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
     d_epoch = epoch;
     timer_thread = new boost::thread(boost::bind(&boost::asio::io_service::run, &io));

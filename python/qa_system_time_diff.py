@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of Sandia, LLC
+# Copyright 2018-2021 National Technology & Engineering Solutions of Sandia, LLC
 # (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government
 # retains certain rights in this software.
 #
@@ -11,9 +11,16 @@
 from builtins import range
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import timing_utils
 import time
 import pmt
+try:
+    import timing_utils
+except ImportError:
+    import os
+    import sys
+    dirname, filename = os.path.split(os.path.abspath(__file__))
+    sys.path.append(os.path.join(dirname, "bindings"))
+    import timing_utils
 
 
 class qa_system_time_diff (gr_unittest.TestCase):
@@ -42,8 +49,8 @@ class qa_system_time_diff (gr_unittest.TestCase):
         self.tb.run()
         time.sleep(0.05)
 
+    # this test has some issues due to how tag_debug saves tags
     def test_002_tags(self):
-        start_time = 0.1
         self.duration = 125000
         tnow = time.time()
 
@@ -60,13 +67,14 @@ class qa_system_time_diff (gr_unittest.TestCase):
         self.tb.connect((self.dut, 1), (self.nullf, 0))
 
         self.tb.start()
-        time.sleep(.01)
+        time.sleep(.02)
 
         tags = self.tag_dbg.current_tags()
+        time_tag = None
         print("Dumping tags")
         for t in tags:
             print('Tag:', t.key, ' ', t.value)
-            if pmt.eq(t.key, pmt.intern("wall_clock_time")):
+            if pmt.eqv(t.key, pmt.intern("wall_clock_time")):
                 time_tag = t
 
         if time_tag:

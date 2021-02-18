@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -24,41 +24,19 @@ private:
     uint64_t d_length;
     int d_length_thresh;
 
-public:
-    /**
-     * Constructor
-     *
-     * @param hi -
-     * @param lo -
-     * @param length -
-     */
-    thresh_trigger_f_impl(float hi, float lo, int length);
-    ~thresh_trigger_f_impl();
-
-    // Where all the action really happens
-    int work(int noutput_items,
-             gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
-
     void disarm(pmt::pmt_t);
 
-    /**
-     *
-     * @param t -
-     */
-    void set_hi(float t) { d_thresh_hi = t; };
+public:
+    thresh_trigger_f_impl(float hi, float lo, int length);
+    ~thresh_trigger_f_impl() override;
 
-    /**
-     *
-     * @param t -
-     */
-    void set_lo(float t) { d_thresh_lo = t; };
+    int work(int noutput_items,
+             gr_vector_const_void_star& input_items,
+             gr_vector_void_star& output_items) override;
 
-    /**
-     *
-     * @param len -
-     */
-    void set_len(int len) { d_length_thresh = len; }
+    void set_hi(float t) override { d_thresh_hi = t; };
+    void set_lo(float t) override { d_thresh_lo = t; };
+    void set_len(int len) override { d_length_thresh = len; }
 };
 
 } // namespace timing_utils

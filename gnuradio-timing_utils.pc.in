@@ -3,8 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: gr-timing_utils38
-Description: GNU Radio OOT with timing tools (Maint 3.8)
+Name: gr-timing_utils
+Description: GNU Radio OOT with timing tools (3.9 API)
 Requires: gnuradio-runtime
 Version: @LIBVER@
 Libs: -L${libdir}

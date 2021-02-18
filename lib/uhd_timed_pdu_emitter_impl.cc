@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -20,7 +20,7 @@ namespace timing_utils {
 
 uhd_timed_pdu_emitter::sptr uhd_timed_pdu_emitter::make(float rate, bool drop_late)
 {
-    return gnuradio::get_initial_sptr(new uhd_timed_pdu_emitter_impl(rate, drop_late));
+    return gnuradio::make_block_sptr<uhd_timed_pdu_emitter_impl>(rate, drop_late);
 }
 
 /*
@@ -40,9 +40,8 @@ uhd_timed_pdu_emitter_impl::uhd_timed_pdu_emitter_impl(float rate, bool drop_lat
 
     message_port_register_out(PMTCONSTSTR__time());
     message_port_register_in(PMTCONSTSTR__set());
-
     set_msg_handler(PMTCONSTSTR__set(),
-                    boost::bind(&uhd_timed_pdu_emitter_impl::handle_set_time, this, _1));
+                    [this](pmt::pmt_t msg) { this->handle_set_time(msg); });
 }
 
 

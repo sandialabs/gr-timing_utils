@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -38,32 +38,24 @@ private:
     uint64_t time_to_samples(double time);
     void process_interrupt();
 
-public:
-    /*!
-     * Constructor
-     *
-     *
-     * \param rate Sample rate (Hz)
-     * \param drop_late If true, do not emit a message for interrupt requests
-     *    in the past
-     *
-     */
-    interrupt_emitter_impl(double rate, bool drop_late);
-    ~interrupt_emitter_impl();
-
-    void set_rate(double rate) { d_rate = rate; }
-    void set_debug(bool value) { debug = value; }
     void handle_set_time(pmt::pmt_t int_time);
-    bool isLoaded() { return loaded; }
+
+public:
+    interrupt_emitter_impl(double rate, bool drop_late);
+    ~interrupt_emitter_impl() override;
+
+    void set_rate(double rate) override { d_rate = rate; }
+    void set_debug(bool value) override { debug = value; }
+    // bool isLoaded() override { return loaded; }
 
     // overloaded block functions
-    bool start();
-    bool stop();
+    bool start() override;
+    bool stop() override;
 
     // Where all the action really happens
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } // namespace timing_utils

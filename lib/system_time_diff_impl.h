@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -27,20 +27,14 @@ private:
     bool d_output_diff;
 
 public:
-    /**
-     * Constructor
-     *
-     * \param update_time Flag to update the time tag to the current system time
-     * \param output_diff Output the time difference to stdout
-     */
     system_time_diff_impl(bool update_time, bool output_diff);
-    ~system_time_diff_impl();
+    ~system_time_diff_impl() override;
 
     // Where all the action really happens
     int general_work(int noutput_items,
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
-                     gr_vector_void_star& output_items);
+                     gr_vector_void_star& output_items) override;
 };
 
 } // namespace timing_utils

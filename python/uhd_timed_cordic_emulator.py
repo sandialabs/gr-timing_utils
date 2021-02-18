@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of Sandia, LLC
+# Copyright 2018-2020 National Technology & Engineering Solutions of Sandia, LLC
 # (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government
 # retains certain rights in this software.
 #
@@ -11,7 +11,6 @@
 from gnuradio import gr
 from gnuradio import blocks
 from gnuradio import filter
-import sandia_utils
 import pmt
 import numpy
 import timing_utils
@@ -55,7 +54,7 @@ class uhd_timed_cordic_emulator(gr.hier_block2):
             self.file = blocks.file_source(gr.sizeof_short * 1, filename, loop)
         else:
             self.file = blocks.file_source(gr.sizeof_gr_complex * 1, filename, loop)
-        self.deint = sandia_utils.interleaved_short_to_complex(False, False, 1.0 / pow(2, 15))
+        self.deint = blocks.interleaved_short_to_complex(False, False, 1.0 / pow(2, 15))
         self.throttle = blocks.throttle(gr.sizeof_gr_complex * 1, samp_rate, True)
         self.tagger = timing_utils.add_usrp_tags_c(fc_start, samp_rate, int(start_time), (start_time - int(start_time)))
         self.tuner = timing_utils.retune_uhd_to_timed_tag(int(samp_rate), timing_utils.PMTCONSTSTR__dsp_freq(), int(start_time), (start_time - int(start_time)))

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018, 2019, 2020 National Technology & Engineering Solutions of
+ * Copyright 2018-2021 National Technology & Engineering Solutions of
  * Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S.
  * Government retains certain rights in this software.
  *
@@ -73,12 +73,11 @@ public:
                            pmt::pmt_t dict_key,
                            uint64_t origin_t_secs,
                            double origin_t_frac);
-    ~timed_tag_retuner_impl();
+    ~timed_tag_retuner_impl() override;
 
-    // Where all the action really happens
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } // namespace timing_utils
