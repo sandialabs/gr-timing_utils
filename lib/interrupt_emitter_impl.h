@@ -29,14 +29,14 @@ private:
     pmt::pmt_t d_pmt_out;
     double d_start_time;
     boost::posix_time::ptime d_epoch;
-    boost::posix_time::ptime last_time;
-    double time_offset;
-    double cum_time;
-    double last_error;
+    double d_time_offset;
 
     pmt::pmt_t samples_to_tpmt(uint64_t trigger_sample);
     uint64_t time_to_samples(double time);
     void process_interrupt();
+
+    double d_last_tag_time;
+    uint64_t d_last_tag_samp;
 
 public:
     /*!

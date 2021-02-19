@@ -48,17 +48,15 @@ interrupt_emitter_impl<T>::interrupt_emitter_impl(double rate, bool drop_late)
     boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
     d_epoch = epoch;
     timer_thread = new boost::thread(boost::bind(&boost::asio::io_service::run, &io));
-    last_error = 0;
-    debug = false;
+    d_last_tag_time = 0; // time,sample starts at 0,0 unless we get an rx_time tag
+    d_last_tag_samp = 0;
+    debug = true;
 }
 
 template <class T>
 bool interrupt_emitter_impl<T>::start()
 {
-    time_offset = (boost::get_system_time() - epoch).total_microseconds() * 1e-6;
-    last_time = boost::get_system_time() -
-                boost::posix_time::microseconds(static_cast<long>(1e6 * time_offset));
-
+    d_time_offset = (boost::get_system_time() - epoch).total_microseconds() * 1e-6;
     return true;
 }
 
@@ -142,7 +140,7 @@ void interrupt_emitter_impl<T>::handle_set_time(pmt::pmt_t time_pmt)
 
     double current_time((boost::get_system_time() - epoch).total_microseconds() /
                             1000000.0 -
-                        time_offset);
+                        d_time_offset);
     double wait_time = t_int + t_frac - current_time;
 
     if (wait_time < 0) {
@@ -199,7 +197,7 @@ int interrupt_emitter_impl<T>::work(int noutput_items,
     // buffer
     boost::posix_time::ptime current_ptime =
         boost::get_system_time() -
-        boost::posix_time::microseconds(static_cast<long>(1e6 * time_offset));
+        boost::posix_time::microseconds(static_cast<long>(1e6 * d_time_offset));
     double current_time((current_ptime - epoch).total_microseconds() / 1e6);
     d_start_sample = this->nitems_read(0) + noutput_items;
     d_start_time = current_time;
@@ -220,41 +218,36 @@ int interrupt_emitter_impl<T>::work(int noutput_items,
         uint64_t t_int = pmt::to_uint64(pmt::tuple_ref(last_tag.value, 0));
         double t_frac = pmt::to_double(pmt::tuple_ref(last_tag.value, 1));
         uint64_t samp = last_tag.offset;
+
+        d_last_tag_time = t_int + t_frac;
+        d_last_tag_samp = samp;
         // printf("Tag at time: %f, sample: %ld, offset: %f, time:%f\n", t_int+t_frac,
-        // samp, time_offset, current_time);
+        // samp, d_time_offset, current_time);
         // What time did we expect to see samp at??
         // Note that we expect to receive the whole buffer at the same time, so we
         // need to reref to the last sample
         double expect_samp =
             current_time - (this->nitems_read(0) + noutput_items - samp) / d_rate;
         double error = expect_samp - t_int - t_frac;
-        time_offset += error;
+        d_time_offset += error;
         d_start_time -= error;
         current_ptime -= boost::posix_time::microseconds(static_cast<long>(1e6 * error));
         UpdateTimer(error);
         if (debug)
             printf("tag_error = %f\n", error);
-    } else if (time_offset > 0) {
-        // See if it took us as long as we think to receive this buffer
-        double buffer_time = noutput_items / d_rate;
-        double time_diff = (current_ptime - last_time).total_microseconds() * 1e-6;
-        double error = time_diff - buffer_time + last_error;
+    } else if (d_time_offset > 0) {
+        // estimate time_now using the last rx_time tag and the samples we have processed since that time.
+        double radio_time_est = d_last_tag_time + ((this->nitems_read(0) + noutput_items - d_last_tag_samp) / d_rate);
+        double error = current_time - radio_time_est;
+
         if (std::abs(error) > 200e-6) {
             // Allow for some sample error, because the system clock isn't perfect
-            time_offset += error;
+            d_time_offset += error;
             d_start_time -= error;
             current_ptime -=
                 boost::posix_time::microseconds(static_cast<long>(1e6 * error));
-            if (debug)
-                printf("sample_error (ms) = %f, items = %d, last_error = %f\n",
-                       1e3 * error,
-                       noutput_items,
-                       last_error);
-            last_error = 0;
-        } else
-            last_error = error;
+        }
     }
-    last_time = current_ptime;
 
     // Tell runtime system how many output items we produced.
     return noutput_items;
