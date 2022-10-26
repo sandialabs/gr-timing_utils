@@ -16,21 +16,27 @@ parameters:
 -   id: freq
     label: Frequency
     dtype: float
+    default: 100e6
 -   id: rate
     label: Rate
     dtype: float
+    default: samp_rate
 -   id: ti
     label: Time (Secs)
     dtype: int
     hide: part
+    default: 0
 -   id: tf
     label: Time (Frac)
     dtype: float
     hide: part
+    default: 0.0
 -   id: tag_now
     label: Tag Now
-    dtype: int
-    default: '0'
+    dtype: bool
+    default: 'False'
+    options: ['False', 'True']
+    option_labels: ['No', 'Yes']
     hide: part
 
 inputs:
@@ -42,8 +48,13 @@ outputs:
     dtype: ${ type.type }
 
 templates:
-    imports: import timing_utils
-    make: timing_utils.add_usrp_tags_${type}(${freq}, ${rate}, ${ti}, ${tf})
+    imports: from gnuradio import timing_utils
+    make: |
+        timing_utils.add_usrp_tags_${type}(${freq}, ${rate}, ${ti}, ${tf})
+        % if context.get('tag_now')():
+        self.${id}.tag_now(1)
+        %endif
+
     callbacks:
     - tag_now(${tag_now})
 

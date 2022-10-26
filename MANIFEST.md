@@ -10,6 +10,7 @@ author:
   - Peter Knee
   - Sam Whiting
   - Brian Adams
+  - Darren Kartchner
 copyright_owner:
   - NTESS, LLC
 license: GPLv3

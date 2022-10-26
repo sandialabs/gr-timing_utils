@@ -16,7 +16,7 @@ inputs:
     optional: true
 
 templates:
-    imports: import timing_utils
+    imports: from gnuradio import timing_utils
     make: timing_utils.usrp_gps_time_sync(self,${usrp_source})
 
 file_format: 1

@@ -10,9 +10,9 @@
 #ifndef INCLUDED_TIMING_UTILS_TIMED_TAG_RETUNER_IMPL_H
 #define INCLUDED_TIMING_UTILS_TIMED_TAG_RETUNER_IMPL_H
 
+#include <gnuradio/timing_utils/constants.h>
+#include <gnuradio/timing_utils/timed_tag_retuner.h>
 #include <pmt/pmt.h>
-#include <timing_utils/constants.h>
-#include <timing_utils/timed_tag_retuner.h>
 #include <queue>
 
 namespace gr {
@@ -51,12 +51,6 @@ struct tune_command_t {
 class timed_tag_retuner_impl : public timed_tag_retuner
 {
 private:
-    // reference time
-    ref_time_t d_ref_time;
-
-    // command queue
-    std::queue<tune_command_t> d_tune_commands;
-
     // sample rate
     double d_sample_rate;
 
@@ -64,6 +58,12 @@ private:
     pmt::pmt_t d_tag_key;
     pmt::pmt_t d_dict_key;
     pmt::pmt_t d_time_key;
+
+    // reference time
+    ref_time_t d_ref_time;
+
+    // command queue
+    std::queue<tune_command_t> d_tune_commands;
 
     // command handler
     void command_handler(pmt::pmt_t msg);
@@ -73,11 +73,11 @@ public:
                            pmt::pmt_t dict_key,
                            uint64_t origin_t_secs,
                            double origin_t_frac);
-    ~timed_tag_retuner_impl() override;
+    ~timed_tag_retuner_impl();
 
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items) override;
+             gr_vector_void_star& output_items);
 };
 
 } // namespace timing_utils

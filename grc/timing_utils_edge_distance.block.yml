@@ -15,7 +15,7 @@ inputs:
     dtype: float
 
 templates:
-    imports: import timing_utils
+    imports: from gnuradio import timing_utils
     make: timing_utils.edge_distance(${rate})
 
 file_format: 1

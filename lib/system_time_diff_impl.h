@@ -10,8 +10,8 @@
 #ifndef INCLUDED_TIMING_UTILS_SYSTEM_TIME_DIFF_IMPL_H
 #define INCLUDED_TIMING_UTILS_SYSTEM_TIME_DIFF_IMPL_H
 
-#include <timing_utils/constants.h>
-#include <timing_utils/system_time_diff.h>
+#include <gnuradio/timing_utils/constants.h>
+#include <gnuradio/timing_utils/system_time_diff.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread_time.hpp>
 
@@ -27,14 +27,20 @@ private:
     bool d_output_diff;
 
 public:
+    /**
+     * Constructor
+     *
+     * \param update_time Flag to update the time tag to the current system time
+     * \param output_diff Output the time difference to stdout
+     */
     system_time_diff_impl(bool update_time, bool output_diff);
-    ~system_time_diff_impl() override;
+    ~system_time_diff_impl();
 
     // Where all the action really happens
     int general_work(int noutput_items,
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
-                     gr_vector_void_star& output_items) override;
+                     gr_vector_void_star& output_items);
 };
 
 } // namespace timing_utils

@@ -91,7 +91,7 @@ int system_time_diff_impl<T>::general_work(int noutput_items,
 
         // process all tags
         int ntime_tags = 0;
-        for (int ii = 0; ii < tags.size(); ii++) {
+        for (size_t ii = 0; ii < tags.size(); ii++) {
             if (pmt::eq(PMTCONSTSTR__wall_clock_time(), tags[ii].key)) {
                 double diff = t_now - pmt::to_double(tags[ii].value);
                 if (d_output_diff) {

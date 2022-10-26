@@ -29,7 +29,7 @@ outputs:
     optional: true
 
 templates:
-    imports: import timing_utils
+    imports: from gnuradio import timing_utils
     make: timing_utils.thresh_trigger_f(${hi}, ${low}, ${length})
     callbacks:
     - set_hi(${hi})

@@ -4,8 +4,6 @@
 # This file is a part of gr-timing_utils
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-#
-
 install(FILES
     timing_utils_timed_freq_xlating_fir.block.yml
     timing_utils_retune_uhd_to_timed_tag.block.yml
@@ -15,7 +13,6 @@ install(FILES
     timing_utils_thresh_trigger_f.block.yml
     timing_utils_edge_distance.block.yml
     timing_utils_edge_detector_bb.block.yml
-    timing_utils_usrp_gps_time_sync.block.yml
     timing_utils_interrupt_emitter.block.yml
     timing_utils_system_time_diff.block.yml
     timing_utils_system_time_tagger.block.yml
@@ -24,3 +21,9 @@ install(FILES
     timing_utils_timed_tag_retuner.block.yml 
     timing_utils_timed_cordic_emulator.block.yml DESTINATION share/gnuradio/grc/blocks
 )
+
+if(UHD_FOUND)
+  message(STATUS "Installing USRP block YML")
+  install(FILES timing_utils_usrp_gps_time_sync.block.yml
+          DESTINATION share/gnuradio/grc/blocks)
+endif()

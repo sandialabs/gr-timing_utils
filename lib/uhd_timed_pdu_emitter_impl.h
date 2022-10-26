@@ -10,7 +10,7 @@
 #ifndef INCLUDED_TIMING_UTILS_UHD_TIMED_PDU_EMITTER_IMPL_H
 #define INCLUDED_TIMING_UTILS_UHD_TIMED_PDU_EMITTER_IMPL_H
 
-#include <timing_utils/uhd_timed_pdu_emitter.h>
+#include <gnuradio/timing_utils/uhd_timed_pdu_emitter.h>
 
 namespace gr {
 namespace timing_utils {
@@ -36,18 +36,29 @@ private:
     pmt::pmt_t samples_to_tpmt(uint64_t);
     uint64_t tpmt_to_samples(pmt::pmt_t);
 
+public:
+    /**
+     * Constructor
+     *
+     * @param rate -
+     * @param drop_late -
+     */
+    uhd_timed_pdu_emitter_impl(float rate, bool drop_late);
+    ~uhd_timed_pdu_emitter_impl();
+
     // input message handler
     void handle_set_time(pmt::pmt_t);
 
-public:
-    uhd_timed_pdu_emitter_impl(float rate, bool drop_late);
-    ~uhd_timed_pdu_emitter_impl() override;
+    /**
+     *
+     * @param rate -
+     */
+    void set_rate(float rate) { d_rate = rate; }
 
-    void set_rate(float rate) override { d_rate = rate; }
-
+    // Where all the action really happens
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items) override;
+             gr_vector_void_star& output_items);
 };
 
 } // namespace timing_utils

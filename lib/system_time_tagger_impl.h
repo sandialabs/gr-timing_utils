@@ -10,8 +10,8 @@
 #ifndef INCLUDED_TIMING_UTILS_SYSTEM_TIME_TAGGER_IMPL_H
 #define INCLUDED_TIMING_UTILS_SYSTEM_TIME_TAGGER_IMPL_H
 
-#include <timing_utils/constants.h>
-#include <timing_utils/system_time_tagger.h>
+#include <gnuradio/timing_utils/constants.h>
+#include <gnuradio/timing_utils/system_time_tagger.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread_time.hpp>
 
@@ -29,14 +29,25 @@ private:
     uint64_t d_total_nitems_read;
 
 public:
+    /*!
+     * \brief Return a shared_ptr to a new instance of timing_utils::system_time_tagger.
+     *
+     * @param tag_interval - number of samples between tags
+     */
     system_time_tagger_impl(uint32_t tag_interval);
-    ~system_time_tagger_impl() override;
+    ~system_time_tagger_impl();
 
+    // Where all the action really happens
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items) override;
+             gr_vector_void_star& output_items);
 
-    void set_interval(uint32_t tag_interval) override;
+    /**
+     * Sets interval between tags
+     *
+     * @param tag_interval
+     */
+    void set_interval(uint32_t tag_interval);
 };
 
 } // namespace timing_utils

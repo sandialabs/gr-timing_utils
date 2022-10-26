@@ -39,7 +39,7 @@ outputs:
 
 templates:
     imports: |-
-        import timing_utils
+        from gnuradio import timing_utils
         import pmt
     make: timing_utils.system_time_diff_${type}(${update_time},${output_diff})
 

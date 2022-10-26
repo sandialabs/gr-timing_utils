@@ -110,15 +110,15 @@ public:
     }
 
 protected:
-    pmt::pmt_t d_out_pmt;
     double error;
+    bool run;
+    bool loaded;
     uint64_t index;
+
+    pmt::pmt_t d_out_pmt;
     boost::mutex mtx;
     boost::posix_time::ptime epoch;
     boost::asio::deadline_timer* timer;
-
-    bool run;
-    bool loaded;
     bool debug;
 
     virtual void process_interrupt() = 0;

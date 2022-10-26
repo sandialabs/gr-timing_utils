@@ -12,8 +12,8 @@
 #endif
 
 #include "add_usrp_tags_impl.h"
-#include <timing_utils/constants.h>
 #include <gnuradio/io_signature.h>
+#include <gnuradio/timing_utils/constants.h>
 
 namespace gr {
 namespace timing_utils {
@@ -35,8 +35,8 @@ add_usrp_tags_impl<T>::add_usrp_tags_impl(double freq,
                                           uint64_t epoch_int,
                                           double epoch_frac)
     : gr::sync_block("add_usrp_tags",
-                     gr::io_signature::make(1, 1, sizeof(gr_complex)),
-                     gr::io_signature::make(1, 1, sizeof(gr_complex)))
+                     gr::io_signature::make(1, 1, sizeof(T)),
+                     gr::io_signature::make(1, 1, sizeof(T)))
 {
     d_rate_pmt = pmt::from_double(rate);
     d_freq_pmt = pmt::from_double(freq);

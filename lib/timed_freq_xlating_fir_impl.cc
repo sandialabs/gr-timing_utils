@@ -46,7 +46,11 @@ timed_freq_xlating_fir_impl<I, O, T>::timed_freq_xlating_fir_impl(
       d_sampling_freq(sampling_freq),
       d_updated(false),
       d_decim(decimation),
-      d_tag_key(tag_key)
+      d_proto_taps(taps),
+      d_tag_key(tag_key),
+      d_phase(0.0),
+      d_tag_freq_applied(false),
+      d_phase_updated(false)
 {
     // fir filter - output is always complex so taps for the fir are always complex
     // even though specified taps can be of a different type
@@ -54,24 +58,28 @@ timed_freq_xlating_fir_impl<I, O, T>::timed_freq_xlating_fir_impl(
     d_composite_fir = new filter::kernel::fir_filter<I, O, gr_complex>(dummy_taps);
 
     // set taps
-    set_taps_(taps);
+    set_taps(taps);
+
 
     // set history size to be the maximum number of supported taps
     // as the buffer can not be resized during operation
-    this->set_history(MAX_NUM_TAPS);
+    this->set_history(d_proto_taps.size());
     build_composite_fir();
+
+    // ensure tags are propagated properly
+    assert(d_proto_taps.size() != 0);
+    this->declare_sample_delay((d_proto_taps.size() - 1) / 2);
 
     // set tag pmt
     d_tag_pmt = pmt::string_to_symbol(d_tag_key);
+
+    // ensure update not marked till a tag is actually received
+    d_updated = false;
 
     this->message_port_register_in(PMTCONSTSTR__freq());
     this->set_msg_handler(PMTCONSTSTR__freq(),
                           [this](pmt::pmt_t msg) { this->handle_set_center_freq(msg); });
 
-    // manually propagate tags
-    this->set_tag_propagation_policy(gr::block::TPP_DONT);
-    d_in_tag_offset = 0;
-    d_out_tag_offset = 0;
 }
 
 template <class I, class O, class T>
@@ -105,6 +113,10 @@ void timed_freq_xlating_fir_impl<I, O, T>::build_composite_fir()
     }
 
     d_composite_fir->set_taps(d_ctaps);
+    if (d_phase_updated) {
+        d_r.set_phase(exp(gr_complex(0, -1.0 * d_phase)));
+        d_phase_updated = false;
+    }
     d_r.set_phase_incr(exp(gr_complex(0, -fwT0 * this->decimation())));
 }
 
@@ -145,16 +157,19 @@ double timed_freq_xlating_fir_impl<I, O, T>::rate() const
 }
 
 template <class I, class O, class T>
-void timed_freq_xlating_fir_impl<I, O, T>::set_center_freq(double center_freq)
+void timed_freq_xlating_fir_impl<I, O, T>::set_center_freq(double center_freq,
+                                                           double phase)
 {
     gr::thread::scoped_lock l(this->d_setlock);
-    set_center_freq_(center_freq);
+    set_center_freq_(center_freq, phase);
 }
 
 template <class I, class O, class T>
-void timed_freq_xlating_fir_impl<I, O, T>::set_center_freq_(double center_freq)
+void timed_freq_xlating_fir_impl<I, O, T>::set_center_freq_(double center_freq,
+                                                            double phase)
 {
     d_center_freq = center_freq;
+    d_phase = phase;
     d_updated = true;
 }
 
@@ -167,27 +182,9 @@ double timed_freq_xlating_fir_impl<I, O, T>::center_freq() const
 template <class I, class O, class T>
 void timed_freq_xlating_fir_impl<I, O, T>::set_taps(const std::vector<T>& taps)
 {
-    gr::thread::scoped_lock l(this->d_setlock);
-    set_taps_(taps);
-}
-
-template <class I, class O, class T>
-void timed_freq_xlating_fir_impl<I, O, T>::set_taps_(const std::vector<T>& taps)
-{
-    if (taps.size() == 0) {
-        throw std::out_of_range(
-            str(boost::format("timed_freq_xlating_fir_impl: invalid "
-                              "number of taps.  must be greater than zero")));
-    }
-
-    if (taps.size() <= MAX_NUM_TAPS) {
-        d_proto_taps = taps;
-        d_updated = true;
-    } else {
-        throw std::out_of_range(str(boost::format("timed_freq_xlating_fir_impl: invalid "
-                                                  "number of taps.  cannot exceed %d") %
-                                    MAX_NUM_TAPS));
-    }
+    assert(taps.size() != 0);
+    d_proto_taps = taps;
+    d_updated = true;
 }
 
 template <class I, class O, class T>
@@ -204,6 +201,13 @@ void timed_freq_xlating_fir_impl<I, O, T>::handle_set_center_freq(pmt::pmt_t msg
         if (pmt::is_real(x)) {
             double freq = pmt::to_double(x);
             set_center_freq_(freq);
+        } else if (pmt::is_pair(x)) {
+            // specifying frequency and phase - mark phase as updated so that
+            // no discontinuities are introduced if phase is left unspecified
+            double freq = pmt::to_double(pmt::car(x));
+            double phase = pmt::to_double(pmt::cdr(x));
+            d_phase_updated = true;
+            set_center_freq_(freq, phase);
         }
     } else if (pmt::is_pair(msg)) {
         pmt::pmt_t x = pmt::cdr(msg);
@@ -240,7 +244,7 @@ void timed_freq_xlating_fir_impl<I, O, T>::scale(std::vector<gr_complex>& output
 {
     // no volk kernel so do by hand
     // TODO: could use volk_16i_s32f_convert_32f on real/imag portions separately
-    for (int i = 0; i < output.size(); ++i) {
+    for (size_t i = 0; i < output.size(); ++i) {
         output[i] = static_cast<gr_complex>(input[i]) * d_ctaps[0];
     }
 }
@@ -262,58 +266,81 @@ int timed_freq_xlating_fir_impl<I, O, T>::work(int noutput_items,
     int consumed = noutput_items * d_decim;
     int produced = noutput_items;
 
+    // if we have received a tag to change the frequency, we will consume
+    // only up until the tag and change the freq on the next work
+    // function call
+    this->get_tags_in_range(tags, 0, a_start, a_end, d_tag_pmt);
+
+    if (tags.size()) {
+        // only update the frequency if the first sample is tagged
+        if (tags[0].offset == a_start) {
+            if (not d_tag_freq_applied) {
+                if (pmt::is_pair(tags[0].value)) {
+                    // inform the block to retune the next time it is run
+                    double new_freq = pmt::to_double(pmt::car(tags[0].value));
+                    double new_phase = pmt::to_double(pmt::cdr(tags[0].value));
+                    handle_set_center_freq(pmt::dict_add(
+                        pmt::make_dict(), PMTCONSTSTR__freq(), tags[0].value));
+                    GR_LOG_INFO(
+                        this->d_logger,
+                        boost::format("Synchronously setting freq xlator to %f Hz with a "
+                                      "phase of %f radians at sample %d") %
+                            new_freq % new_phase % tags[0].offset);
+                    d_tag_freq_applied = true;
+                } else if (pmt::is_real(tags[0].value)) {
+                    double new_freq = pmt::to_double(tags[0].value);
+                    if (new_freq != d_center_freq) {
+                        // inform the block to retune the next time it is run
+                        handle_set_center_freq(pmt::dict_add(
+                            pmt::make_dict(), PMTCONSTSTR__freq(), tags[0].value));
+                        GR_LOG_INFO(
+                            this->d_logger,
+                            boost::format(
+                                "Synchronously setting freq xlator to %f at sample %d") %
+                                new_freq % tags[0].offset);
+                    }
+                    d_tag_freq_applied = true;
+                } else {
+                    GR_LOG_ERROR(this->d_logger, "Invalid frequency tag type");
+                }
+            } else {
+                // tag frequency was applied on previous iteration so mark unapplied
+                // for next tag to be processed
+                d_tag_freq_applied = false;
+            } /* end not d_tag_freq_applied */
+
+            // potentially consume up to the next tagged sample if the
+            // frequency was not updated
+            if (tags.size() > 1) {
+                consumed = tags[1].offset - a_start;
+                produced = ceil(1.0 * consumed / d_decim);
+            }
+        } else {
+            // consume up to (but not including) the first tag so that the
+            // frequency update will be applied to the tagged sample on the
+            // next work function call
+            consumed = tags[0].offset - a_start;
+            produced = ceil(1.0 * consumed / d_decim);
+        } /* end tags[0].offset = a_start */
+    }     /* end tags.size() */
+
     // rebuild composite FIR if the center freq has changed
     if (d_updated) {
+        this->set_history(d_proto_taps.size());
+        this->declare_sample_delay((d_proto_taps.size() - 1) / 2);
         build_composite_fir();
         d_updated = false;
 
         // Tell downstream items where the frequency change was applied
-        this->add_item_tag(0,
-                           this->nitems_written(0),
-                           PMTCONSTSTR__freq(),
-                           pmt::from_double(d_center_freq),
-                           this->alias_pmt());
+        // but only when the change was not applied with an existing tag
+        if (not d_tag_freq_applied) {
+            this->add_item_tag(0,
+                               this->nitems_written(0),
+                               PMTCONSTSTR__freq(),
+                               pmt::from_double(d_center_freq),
+                               this->alias_pmt());
+        }
         return 0; // history requirements may have changed.
-    }
-
-    // if we have received a tag to change the frequency, we will consume
-    // only up until the tag and change the freq
-    this->get_tags_in_range(tags, 0, a_start, a_end, d_tag_pmt);
-
-    if (tags.size()) {
-        // after the first tag, we will consume up to (and including) the tag
-        consumed = tags[0].offset - a_start + 1;
-        produced = ceil(1.0 * consumed / d_decim);
-        // std::cout << "consuming " << consumed << " items, producing " << produced << "
-        // items" << ", noutput_items = " << noutput_items << std::endl;
-        double new_freq = pmt::to_double(tags[0].value);
-        if ((pmt::eq(tags[0].key, d_tag_pmt)) and (new_freq != d_center_freq)) {
-            // and inform the block to retune the next time it is run
-            handle_set_center_freq(
-                pmt::cons(PMTCONSTSTR__freq(), pmt::from_double(new_freq)));
-            GR_LOG_INFO(
-                this->d_logger,
-                boost::format("Synchronously setting freq xlator to %f at sample %d") %
-                    new_freq % tags[0].offset);
-        }
-    }
-
-    // propagate all tags for samples consumed
-    this->get_tags_in_range(all_tags, 0, a_start, a_end);
-    if (all_tags.size()) {
-        // propagate all tags up to and including consumed tag
-        size_t ind = 0;
-        for (size_t ind = 0; ind < all_tags.size(); ++ind) {
-            if (all_tags[ind].offset > a_start + (uint64_t)consumed) {
-                break;
-            }
-
-            uint64_t offset =
-                (all_tags[ind].offset - d_in_tag_offset) / (uint64_t)d_decim +
-                d_out_tag_offset;
-            this->add_item_tag(
-                0, offset, all_tags[ind].key, all_tags[ind].value, all_tags[ind].srcid);
-        }
     }
 
     // the magic

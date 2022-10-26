@@ -50,7 +50,7 @@ asserts:
 
 templates:
     imports: |-
-        import timing_utils
+        from gnuradio import timing_utils
         import pmt
     make: timing_utils.tag_uhd_offset_${type}(${rate}, ${interval})
     callbacks:

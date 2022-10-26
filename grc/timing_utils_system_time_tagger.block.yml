@@ -30,7 +30,7 @@ outputs:
 
 templates:
     imports: |-
-        import timing_utils
+        from gnuradio import timing_utils
         import pmt
     make: timing_utils.system_time_tagger_${type}(${interval})
 

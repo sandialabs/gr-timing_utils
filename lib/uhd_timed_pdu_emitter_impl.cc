@@ -12,8 +12,8 @@
 #endif
 
 #include "uhd_timed_pdu_emitter_impl.h"
-#include <timing_utils/constants.h>
 #include <gnuradio/io_signature.h>
+#include <gnuradio/timing_utils/constants.h>
 
 namespace gr {
 namespace timing_utils {
@@ -184,7 +184,7 @@ int uhd_timed_pdu_emitter_impl::work(int noutput_items,
                                      gr_vector_const_void_star& input_items,
                                      gr_vector_void_star& output_items)
 {
-    const gr_complex* in = (const gr_complex*)input_items[0];
+    //const gr_complex* in = (const gr_complex*)input_items[0];
 
     std::vector<tag_t> tags;
 
@@ -207,7 +207,7 @@ int uhd_timed_pdu_emitter_impl::work(int noutput_items,
     get_tags_in_range(
         tags, 0, nitems_read(0), (nitems_read(0) + noutput_items), PMTCONSTSTR__rx_time());
     if (tags.size()) {
-        for (int ii = 0; ii < tags.size(); ii++) {
+        for (size_t ii = 0; ii < tags.size(); ii++) {
             pmt::pmt_t tpmt = pmt::cons(pmt::tuple_ref(tags[ii].value, 0),
                                         pmt::tuple_ref(tags[ii].value, 1));
             uint64_t t_int = tpmt_to_s(tpmt);

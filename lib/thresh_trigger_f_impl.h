@@ -10,7 +10,7 @@
 #ifndef INCLUDED_TIMING_UTILS_THRESH_TRIGGER_F_IMPL_H
 #define INCLUDED_TIMING_UTILS_THRESH_TRIGGER_F_IMPL_H
 
-#include <timing_utils/thresh_trigger_f.h>
+#include <gnuradio/timing_utils/thresh_trigger_f.h>
 
 namespace gr {
 namespace timing_utils {
@@ -21,22 +21,43 @@ private:
     float d_thresh_hi;
     float d_thresh_lo;
     bool d_blank;
+    uint64_t d_length_thresh;
     uint64_t d_length;
-    int d_length_thresh;
-
-    void disarm(pmt::pmt_t);
 
 public:
+    /**
+     * Constructor
+     *
+     * @param hi -
+     * @param lo -
+     * @param length -
+     */
     thresh_trigger_f_impl(float hi, float lo, int length);
-    ~thresh_trigger_f_impl() override;
+    ~thresh_trigger_f_impl();
 
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items) override;
+             gr_vector_void_star& output_items);
 
-    void set_hi(float t) override { d_thresh_hi = t; };
-    void set_lo(float t) override { d_thresh_lo = t; };
-    void set_len(int len) override { d_length_thresh = len; }
+    void disarm(pmt::pmt_t);
+
+    /**
+     *
+     * @param t -
+     */
+    void set_hi(float t) { d_thresh_hi = t; };
+
+    /**
+     *
+     * @param t -
+     */
+    void set_lo(float t) { d_thresh_lo = t; };
+
+    /**
+     *
+     * @param len -
+     */
+    void set_len(int len) { d_length_thresh = len; }
 };
 
 } // namespace timing_utils

@@ -4,7 +4,11 @@
 # This file is a part of gr-timing_utils
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-#
+
+########################################################################
+# Invoke macro to generate various sources and headers
+########################################################################
+include(GrMiscUtils)
 
 ########################################################################
 # Setup library
@@ -12,6 +16,7 @@
 include(GrPlatform) #define LIB_SUFFIX
 
 list(APPEND timing_utils_sources
+    ${generated_sources}
     add_usrp_tags_impl.cc
     uhd_timed_pdu_emitter_impl.cc
     interrupt_emitter_impl.cc
@@ -34,11 +39,11 @@ endif(NOT timing_utils_sources)
 
 add_library(gnuradio-timing_utils SHARED ${timing_utils_sources})
 target_link_libraries(gnuradio-timing_utils
-                      gnuradio::gnuradio-runtime
-                      gnuradio::gnuradio-filter
-                      gnuradio::gnuradio-blocks
-                      gnuradio::gnuradio-fft
-                      gnuradio::gnuradio-pmt
+	gnuradio::gnuradio-runtime
+        gnuradio::gnuradio-filter
+	gnuradio::gnuradio-blocks
+	gnuradio::gnuradio-fft
+        gnuradio::gnuradio-pmt
 )
 target_include_directories(gnuradio-timing_utils
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>

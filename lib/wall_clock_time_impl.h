@@ -10,8 +10,8 @@
 #ifndef INCLUDED_TIMING_UTILS_WALL_CLOCK_TIME_IMPL_H
 #define INCLUDED_TIMING_UTILS_WALL_CLOCK_TIME_IMPL_H
 
-#include <timing_utils/constants.h>
-#include <timing_utils/wall_clock_time.h>
+#include <gnuradio/timing_utils/constants.h>
+#include <gnuradio/timing_utils/wall_clock_time.h>
 
 namespace gr {
 namespace timing_utils {
@@ -23,11 +23,11 @@ private:
     std::string d_name;
     pmt::pmt_t d_key;
 
-    void handle_pdu(pmt::pmt_t pdu);
-
 public:
     wall_clock_time_impl(const pmt::pmt_t key);
-    ~wall_clock_time_impl() override;
+    ~wall_clock_time_impl();
+
+    void handle_pdu(pmt::pmt_t pdu);
 };
 
 } // namespace timing_utils

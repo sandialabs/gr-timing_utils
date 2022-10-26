@@ -24,7 +24,7 @@ outputs:
     optional: true
 
 templates:
-  imports: import timing_utils, pmt
+  imports: from gnuradio import timing_utils, pmt
   make: timing_utils.time_delta(${delta_key}, ${time_key})
 
 file_format: 1

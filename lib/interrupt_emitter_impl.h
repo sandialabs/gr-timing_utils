@@ -11,7 +11,7 @@
 #define INCLUDED_TIMING_UTILS_INTERRUPT_EMITTER_IMPL_H
 
 #include "reference_timer.h"
-#include <timing_utils/interrupt_emitter.h>
+#include <gnuradio/timing_utils/interrupt_emitter.h>
 
 namespace gr {
 namespace timing_utils {
@@ -38,24 +38,36 @@ private:
     double d_last_tag_time;
     uint64_t d_last_tag_samp;
 
-    void handle_set_time(pmt::pmt_t int_time);
+    // integral loop gain for tracking time offset error
+    double d_gain;
 
 public:
-    interrupt_emitter_impl(double rate, bool drop_late);
-    ~interrupt_emitter_impl() override;
+    /*!
+     * Constructor
+     *
+     *
+     * \param rate Sample rate (Hz)
+     * \param drop_late If true, do not emit a message for interrupt requests
+     *    in the past
+     * \param loop_gain Clock rate drift tracking loop gain
+     *
+     */
+    interrupt_emitter_impl(double rate, bool drop_late, double loop_gain = .0001);
+    ~interrupt_emitter_impl();
 
-    void set_rate(double rate) override { d_rate = rate; }
-    void set_debug(bool value) override { debug = value; }
-    // bool isLoaded() override { return loaded; }
+    void set_rate(double rate) { d_rate = rate; }
+    void set_debug(bool value) { debug = value; }
+    void handle_set_time(pmt::pmt_t int_time);
+    bool isLoaded() { return loaded; }
 
     // overloaded block functions
-    bool start() override;
-    bool stop() override;
+    bool start();
+    bool stop();
 
     // Where all the action really happens
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items) override;
+             gr_vector_void_star& output_items);
 };
 
 } // namespace timing_utils

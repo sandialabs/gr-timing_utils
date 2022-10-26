@@ -10,8 +10,8 @@
 #ifndef INCLUDED_TIMING_UTILS_TIME_DELTA_IMPL_H
 #define INCLUDED_TIMING_UTILS_TIME_DELTA_IMPL_H
 
-#include <timing_utils/constants.h>
-#include <timing_utils/time_delta.h>
+#include <gnuradio/timing_utils/constants.h>
+#include <gnuradio/timing_utils/time_delta.h>
 
 namespace gr {
 namespace timing_utils {
@@ -28,13 +28,18 @@ private:
     double d_sum_x, d_sum_x2;
     int d_n;
 
-    void handle_pdu(pmt::pmt_t pdu);
-
 public:
+    /**
+     * Constructor
+     *
+     */
     time_delta_impl(const pmt::pmt_t delta_key, const pmt::pmt_t time_key);
-    ~time_delta_impl() override;
+    ~time_delta_impl();
 
-    bool stop() override;
+    // overloaded functions
+    bool stop();
+
+    void handle_pdu(pmt::pmt_t pdu);
 };
 
 } // namespace timing_utils

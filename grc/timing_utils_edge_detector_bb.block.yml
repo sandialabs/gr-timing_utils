@@ -20,7 +20,7 @@ outputs:
     dtype: byte
 
 templates:
-    imports: import timing_utils
+    imports: from gnuradio import timing_utils
     make: timing_utils.edge_detector_bb(${mode})
 
 file_format: 1

@@ -11,7 +11,7 @@
 #include "config.h"
 #endif
 
-#include <timing_utils/constants.h>
+#include <gnuradio/timing_utils/constants.h>
 
 namespace gr {
 namespace timing_utils {

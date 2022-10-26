@@ -124,7 +124,7 @@ int tag_uhd_offset_impl<T>::work(int noutput_items,
                             (this->nitems_read(0) + noutput_items),
                             PMTCONSTSTR__rx_time());
     if (tags.size()) {
-        for (int ii = 0; ii < tags.size(); ii++) {
+        for (size_t ii = 0; ii < tags.size(); ii++) {
             set_time_tag(tags[ii]);
             this->add_item_tag(0, tags[ii].offset, d_key, d_time_tag);
             // GR_LOG_INFO(this->d_logger, boost::format("TAGGG! at sample %d") %

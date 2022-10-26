@@ -32,7 +32,7 @@ outputs:
 
 templates:
     imports: |-
-        import timing_utils
+        from gnuradio import timing_utils
         import pmt
     make: timing_utils.timed_tag_retuner(${rate}, pmt.intern(${dict_key}), int(${time}),
         (${time} - int(${time})))

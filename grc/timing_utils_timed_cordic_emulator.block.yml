@@ -48,7 +48,7 @@ outputs:
 
 templates:
     imports: |-
-            import timing_utils
+            from gnuradio import timing_utils
             import sandia_utils
     make: timing_utils.uhd_timed_cordic_emulator(${filename}, ${replay}, ${decimation},
         ${samp_rate}, ${f0}, ${short}, ${epoch})

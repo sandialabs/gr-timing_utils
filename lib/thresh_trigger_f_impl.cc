@@ -12,8 +12,8 @@
 #endif
 
 #include "thresh_trigger_f_impl.h"
-#include <timing_utils/constants.h>
 #include <gnuradio/io_signature.h>
+#include <gnuradio/timing_utils/constants.h>
 
 namespace gr {
 namespace timing_utils {
@@ -69,7 +69,7 @@ int thresh_trigger_f_impl::work(int noutput_items,
     uint64_t nitems = std::min(64, noutput_items);
 
     // if magnitude is greater than threshold, output zero, otherwise pass input
-    for (int ii = 0; ii < nitems; ii++) {
+    for (size_t ii = 0; ii < nitems; ii++) {
 
         // start blanking when over the high threshold
         if (mag[ii] > d_thresh_hi) {
