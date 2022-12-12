@@ -15,6 +15,7 @@
 #include <gnuradio/io_signature.h>
 #include <gnuradio/timing_utils/constants.h>
 #include <cmath>
+#include <boost/format.hpp>
 
 namespace gr {
 namespace timing_utils {

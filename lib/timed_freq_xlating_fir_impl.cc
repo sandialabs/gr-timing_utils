@@ -15,6 +15,7 @@
 #include <gnuradio/io_signature.h>
 #include <volk/volk.h>
 #include <stdexcept>
+#include <boost/format.hpp>
 
 namespace gr {
 namespace timing_utils {
