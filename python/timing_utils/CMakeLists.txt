@@ -32,7 +32,7 @@ GR_PYTHON_INSTALL(
 if(UHD_FOUND)
   message(STATUS "Installing UHD py files")
   GR_PYTHON_INSTALL(FILES usrp_gps_time_sync.py DESTINATION
-                    ${GR_PYTHON_DIR}/gnuradiotiming_utils)
+                    ${GR_PYTHON_DIR}/gnuradio/timing_utils)
 endif()
 
 
