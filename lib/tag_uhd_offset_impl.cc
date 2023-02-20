@@ -13,7 +13,7 @@
 
 #include "tag_uhd_offset_impl.h"
 #include <gnuradio/io_signature.h>
-
+#include <boost/format.hpp>
 namespace gr {
 namespace timing_utils {
 
@@ -41,7 +41,7 @@ tag_uhd_offset_impl<T>::tag_uhd_offset_impl(float rate, uint32_t tag_interval)
       d_time_tag(pmt::PMT_NIL)
 {
     set_interval(tag_interval);
-    GR_LOG_INFO(this->d_logger, "setting up time tagger");
+    this->d_logger->info("setting up time tagger");
 
     this->message_port_register_out(PMTCONSTSTR__time());
 }
@@ -80,9 +80,8 @@ void tag_uhd_offset_impl<T>::update_time_tag(uint64_t offset)
 {
     double delta = ((offset - d_time_tag_offset) / d_rate);
     if (delta < 0) {
-        GR_LOG_ERROR(this->d_logger,
-                     boost::format("can't go back in time...updating time tag failed "
-                                   "(requested delta = %fs)") %
+        this->d_logger->error("can't go back in time...updating time tag failed "
+                                   "(requested delta = {:e}s)",
                          delta);
         return;
     }
@@ -148,8 +147,7 @@ int tag_uhd_offset_impl<T>::work(int noutput_items,
                 // d_next_tag_offset);
             } else {
                 // we should not have gotten into this state...
-                GR_LOG_WARN(
-                    this->d_logger,
+                this->d_logger->warn(
                     "unexpected state: attempted to tag item in previous work call!");
                 // reset the next tag offset to the first item in the next input buffer;
                 d_next_tag_offset = d_total_nitems_read;

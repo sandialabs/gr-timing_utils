@@ -57,7 +57,7 @@ void thresh_trigger_f_impl::disarm(pmt::pmt_t msg)
 {
     // effectively disables the trigger
     d_length = d_length_thresh + 1;
-    GR_LOG_INFO(d_logger, "disarmed!");
+    d_logger->info("disarmed!");
 }
 
 

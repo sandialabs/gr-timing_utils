@@ -15,6 +15,7 @@
 #include <gnuradio/io_signature.h>
 #include <gnuradio/timing_utils/constants.h>
 #include <cmath>
+#include <boost/format.hpp>
 
 namespace gr {
 namespace timing_utils {
@@ -79,7 +80,7 @@ pmt::pmt_t interrupt_emitter_impl<T>::samples_to_tpmt(uint64_t trigger_sample)
     if (time < 0) {
         // this is an unlikely edge case where sample/WCT has experienced sudden slew,
         // catch it set the time to the minimum representable value, zero
-        GR_LOG_DEBUG(this->d_logger,
+        this->d_logger->debug(
             "Late sampled-based interrupt request received...setting time to minimum representable value");
         time = 0;
     }
@@ -98,7 +99,7 @@ uint64_t interrupt_emitter_impl<T>::time_to_samples(double time)
 {
     uint64_t sample;
     if (time < d_start_time) {
-        GR_LOG_DEBUG(this->d_logger, 
+        this->d_logger->debug(
             "Sample time precedes last sample processed...setting sample index to last sample processed");
         sample = d_start_sample;
     } else {
@@ -162,8 +163,7 @@ void interrupt_emitter_impl<T>::handle_set_time(pmt::pmt_t time_pmt)
 
     if (wait_time < 0) {
         if (d_drop_late) {
-            GR_LOG_DEBUG(this->d_logger,
-                         boost::format("Dropping late interrupt request: %0.2f") %
+            this->d_logger->debug("Dropping late interrupt request: {:e}",
                              wait_time);
         } else {
             // Interrupt right now
