@@ -78,8 +78,7 @@ int system_time_tagger_impl<T>::work(int noutput_items,
                 d_next_tag_offset += d_interval;
             } else {
                 // we should not have gotten into this state...
-                GR_LOG_WARN(
-                    this->d_logger,
+                this->d_logger->warn(
                     "unexpected state: attempted to tag item in previous work call!");
                 // reset the next tag offset to the first item in the next input buffer;
                 d_next_tag_offset = d_total_nitems_read;

@@ -49,7 +49,7 @@ void wall_clock_time_impl::handle_pdu(pmt::pmt_t pdu)
 {
     // make sure PDU data is formed properly
     if (!(pmt::is_pair(pdu))) {
-        GR_LOG_WARN(d_logger, "received unexpected PMT (non-pair)");
+        d_logger->warn("received unexpected PMT (non-pair)");
         return;
     }
 

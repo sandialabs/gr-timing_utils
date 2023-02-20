@@ -68,7 +68,7 @@ void timed_tag_retuner_impl::command_handler(pmt::pmt_t msg)
     gr::thread::scoped_lock l(this->d_setlock);
 
     if (!pmt::is_dict(msg)) {
-        GR_LOG_ERROR(d_logger, "Retune commands must be dictioanries");
+        d_logger->error("Retune commands must be dictioanries");
         return;
     }
 
@@ -76,7 +76,7 @@ void timed_tag_retuner_impl::command_handler(pmt::pmt_t msg)
     try {
         lo_offset = pmt::dict_ref(msg, d_dict_key, pmt::PMT_NIL);
     } catch (...) {
-        GR_LOG_ERROR(d_logger, "Unable to read dictionary keys");
+        d_logger->error("Unable to read dictionary keys");
         return;
     }
     if (!pmt::equal(lo_offset, pmt::PMT_NIL)) {
@@ -84,7 +84,7 @@ void timed_tag_retuner_impl::command_handler(pmt::pmt_t msg)
         try {
             offset = pmt::to_double(lo_offset);
         } catch (...) {
-            GR_LOG_ERROR(d_logger, "Tune offset is wrong type.  Should be double");
+            d_logger->error("Tune offset is wrong type.  Should be double");
             return;
         }
 
@@ -105,7 +105,7 @@ void timed_tag_retuner_impl::command_handler(pmt::pmt_t msg)
                 tag_now = false;
             }
         } catch (...) {
-            GR_LOG_ERROR(d_logger, "Unable to determine retune time.  Tagging now");
+            d_logger->error("Unable to determine retune time.  Tagging now");
         }
 
         // only push command onto stack if space allows
@@ -142,7 +142,7 @@ int timed_tag_retuner_impl::work(int noutput_items,
             double frac = pmt::to_double(pmt::tuple_ref(tags[end].value, 1));
             d_ref_time.set(secs, frac, offset);
         } catch (...) {
-            GR_LOG_ERROR(d_logger, "Invalid tag value");
+            d_logger->error("Invalid tag value");
         }
     }
 

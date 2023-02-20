@@ -63,7 +63,7 @@ template <class T>
 void add_usrp_tags_impl<T>::update_tags(pmt::pmt_t update)
 {
     if (!pmt::is_dict(update)) {
-        GR_LOG_NOTICE(this->d_logger, "received unexpected PMT (non-dict)");
+        this->d_logger->notice("received unexpected PMT (non-dict)");
         return;
     }
 
@@ -80,7 +80,7 @@ void add_usrp_tags_impl<T>::update_tags(pmt::pmt_t update)
     d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_rate(), d_rate_pmt);
     d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_freq(), d_freq_pmt);
     d_pmt_dict = pmt::dict_add(d_pmt_dict, PMTCONSTSTR__rx_time(), d_time_pmt);
-    GR_LOG_DEBUG(this->d_logger, "Updating tags");
+    this->d_logger->debug("Updating tags");
 }
 
 template <class T>
