@@ -101,7 +101,6 @@ find_package(Doxygen)
 # Dependencies
 ########################################################################
 find_package(gnuradio-pdu_utils "3.10.0" REQUIRED)
-find_package(gnuradio-sandia_utils "3.10" REQUIRED)
 
 ########################################################################
 # Setup doxygen option
