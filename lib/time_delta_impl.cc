@@ -13,6 +13,7 @@
 
 #include "time_delta_impl.h"
 #include <gnuradio/io_signature.h>
+#include <boost/format.hpp>
 
 namespace gr {
 namespace timing_utils {
@@ -55,8 +56,8 @@ bool time_delta_impl::stop()
 
     GR_LOG_INFO(
         d_logger,
-        boost::format("WALL_CLOCK_TIME_DEBUG (%s): Mean = %0.6f ms, Var = %0.6f ms") %
-            d_name % mean % var);
+        str(boost::format("WALL_CLOCK_TIME_DEBUG (%s): Mean = %0.6f ms, Var = %0.6f ms") %
+            d_name % mean % var));
     return true;
 }
 
@@ -83,14 +84,14 @@ void time_delta_impl::handle_pdu(pmt::pmt_t pdu)
     pmt::pmt_t wct_pmt = pmt::dict_ref(meta, d_time_key, pmt::PMT_NIL);
     if (!pmt::is_real(wct_pmt)) {
         GR_LOG_DEBUG(d_logger,
-                     boost::format("PDU received with no wall clock time at %f") % t_now);
+                     str(boost::format("PDU received with no wall clock time at %f") % t_now));
     } else {
         double pdu_time = pmt::to_double(wct_pmt);
         double time_delta = (t_now - pdu_time) * 1000.0;
         GR_LOG_DEBUG(
             d_logger,
-            boost::format("%s PDU received at %f with time delta %f milliseconds") %
-                d_name % t_now % time_delta);
+            str(boost::format("%s PDU received at %f with time delta %f milliseconds") %
+                d_name % t_now % time_delta));
 
         // add to metadata
         meta = pmt::dict_add(meta, d_delta_key, pmt::from_double(time_delta));

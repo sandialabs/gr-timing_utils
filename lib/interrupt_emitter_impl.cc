@@ -15,6 +15,7 @@
 #include <gnuradio/io_signature.h>
 #include <gnuradio/timing_utils/constants.h>
 #include <cmath>
+#include <boost/format.hpp>
 
 namespace gr {
 namespace timing_utils {
@@ -163,8 +164,8 @@ void interrupt_emitter_impl<T>::handle_set_time(pmt::pmt_t time_pmt)
     if (wait_time < 0) {
         if (d_drop_late) {
             GR_LOG_DEBUG(this->d_logger,
-                         boost::format("Dropping late interrupt request: %0.2f") %
-                             wait_time);
+                         str(boost::format("Dropping late interrupt request: %0.2f") %
+                             wait_time));
         } else {
             // Interrupt right now
             if (debug)
