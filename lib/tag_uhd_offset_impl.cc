@@ -13,6 +13,7 @@
 
 #include "tag_uhd_offset_impl.h"
 #include <gnuradio/io_signature.h>
+#include <boost/format.hpp>
 
 namespace gr {
 namespace timing_utils {
@@ -81,9 +82,9 @@ void tag_uhd_offset_impl<T>::update_time_tag(uint64_t offset)
     double delta = ((offset - d_time_tag_offset) / d_rate);
     if (delta < 0) {
         GR_LOG_ERROR(this->d_logger,
-                     boost::format("can't go back in time...updating time tag failed "
+                     str(boost::format("can't go back in time...updating time tag failed "
                                    "(requested delta = %fs)") %
-                         delta);
+                         delta));
         return;
     }
     d_time_tag_frac_sec += delta;

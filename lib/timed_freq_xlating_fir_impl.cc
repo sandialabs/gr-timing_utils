@@ -15,6 +15,7 @@
 #include <gnuradio/io_signature.h>
 #include <volk/volk.h>
 #include <stdexcept>
+#include <boost/format.hpp>
 
 namespace gr {
 namespace timing_utils {
@@ -283,9 +284,9 @@ int timed_freq_xlating_fir_impl<I, O, T>::work(int noutput_items,
                         pmt::make_dict(), PMTCONSTSTR__freq(), tags[0].value));
                     GR_LOG_INFO(
                         this->d_logger,
-                        boost::format("Synchronously setting freq xlator to %f Hz with a "
+                        str(boost::format("Synchronously setting freq xlator to %f Hz with a "
                                       "phase of %f radians at sample %d") %
-                            new_freq % new_phase % tags[0].offset);
+                            new_freq % new_phase % tags[0].offset));
                     d_tag_freq_applied = true;
                 } else if (pmt::is_real(tags[0].value)) {
                     double new_freq = pmt::to_double(tags[0].value);
@@ -295,9 +296,9 @@ int timed_freq_xlating_fir_impl<I, O, T>::work(int noutput_items,
                             pmt::make_dict(), PMTCONSTSTR__freq(), tags[0].value));
                         GR_LOG_INFO(
                             this->d_logger,
-                            boost::format(
+                            str(boost::format(
                                 "Synchronously setting freq xlator to %f at sample %d") %
-                                new_freq % tags[0].offset);
+                                new_freq % tags[0].offset));
                     }
                     d_tag_freq_applied = true;
                 } else {
